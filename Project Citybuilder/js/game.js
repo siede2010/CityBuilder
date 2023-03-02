@@ -84,11 +84,16 @@ class GameSystem
             this.toolPos = this.getMousePosition(this.toolBar,e)
         })
         this.toolBar.addEventListener("mousedown",(e) => {
+            console.log(this.selectedIndex)
+            console.log(this.hoverIndex)
             if (this.hoverIndex != -1)
                 if (this.hoverIndex == this.selectedIndex)
-                    this.selectedIndex == -1
+                    this.selectedIndex = -1
                 else
-                    this.selectedIndex == this.hoverIndex
+                    this.selectedIndex = this.hoverIndex
+        })
+        this.toolBar.addEventListener("mouseleave",(e) => {
+            this.toolPos = [0,0]
         })
 
         this.animate()
