@@ -2,6 +2,10 @@ function building()
 {
 
 }
+function getBuildingsOfType(selectedType)
+{
+    return allBuildings.filter(building => building.type == selectedType)
+}
 let allBuildings = []
 class Building
 {

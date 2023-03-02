@@ -5,7 +5,7 @@ function game() {
     bars = getElementById(getElementById(gameUI,"row1"),"bars")
     gameStats = []
     for (let i in stats)
-        gameStats.push([stats[i],new GlobalVar(50)])
+        gameStats.push([stats[i],new GlobalVar(50).setName(stats[i])])
 }
 let gameSystem
 
@@ -20,6 +20,12 @@ function addBar(ui,trackValue)
     barOut.className = "progress progress-bar-striped bg-dark"
     barOut.style = "margin:4px"
     barIn.className = "progress-bar progress-bar-striped "
+    barOut.addEventListener("mouseenter",(e) => {
+        barIn.innerText = trackValue.name
+    })
+    barOut.addEventListener("mouseleave",(e) => {
+        barIn.innerText = ""
+    })
     barUpdates.push([setInterval(updateBar,100),trackValue,barIn])
     return barIn
 }
@@ -89,6 +95,7 @@ class GameSystem
                     this.selectedIndex = -1
                 else
                     this.selectedIndex = this.hoverIndex
+            this.placeDraw(this.selectedIndex != -1)
         })
         this.toolBar.addEventListener("mouseleave",(e) => {
             this.toolPos = [0,0]

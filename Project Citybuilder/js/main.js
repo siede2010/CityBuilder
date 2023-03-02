@@ -7,6 +7,13 @@ class GlobalVar
     constructor(startVar)
     {
         this.var = startVar
+        this.name = ""
+    }
+
+    setName(newName)
+    {
+        this.name = newName
+        return this
     }
 
     getVar()
