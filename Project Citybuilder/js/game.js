@@ -39,11 +39,15 @@ class GameSystem
 {
     constructor(size,margin,vessel,stats)
     {
+        //Static variables
         this.gameStats = stats
-        let canvasX = size*tilesize.x+margin;
-        let canvasY = size*tilesize.y+margin+64;
+        let canvasX = Math.max(size*tilesize.x,320);
+        let canvasY = size*tilesize.y+64+64;
         this.margin = margin;
-        let animationFrame = 0
+        this.drawPlace = false
+        this.clickPos = [0,0]
+        this.parent = vessel;
+        gameSystem = this
         this.selectableTool = [
             [14,16],
             [60,16],
@@ -51,17 +55,11 @@ class GameSystem
             [156,16],
             [202,16],
         ]
-        this.drawPlace = false
-        this.clickPos = [0,0]
-        this.parent = vessel;
-        gameSystem = this
-
-        this.toolBar = document.createElement("canvas")
-        this.toolBar.width = 320
-        this.toolBar.height = 64
         this.hoverIndex = -1
         this.selectedIndex = -1
+        this.offset = [24,64]
 
+        //Normal Ground Tile Set
         this.tileGrid = []
         for(let iy = 0;iy<size;iy++)
         {
@@ -69,6 +67,10 @@ class GameSystem
             for(let ix = 0;ix<size;ix++)
                 this.tileGrid[this.tileGrid.length-1].push(null)
         }
+        this.gameSize = { x:this.tileGrid.length*tilesize.x, 
+                          y:this.tileGrid[0].length*tilesize.y}
+
+        //Floor Ground Tile Set
         this.tileGridUnder = []
         for(let iy = 0;iy<size;iy++)
         {
@@ -76,32 +78,38 @@ class GameSystem
             for(let ix = 0;ix<size;ix++)
                 this.tileGridUnder[this.tileGridUnder.length-1].push(null)
         }
+
+        //PlayField
         this.canvas = document.createElement("canvas")
         this.canvas.width = canvasX;
         this.canvas.height = canvasY;
         getElementById(this.parent,"row1").append(this.canvas)
         this.parent.append(this.toolBar)
+
+        //Events
         this.canvas.addEventListener("mousedown",(e) => {
             this.clickPos = this.getMousePosition(this.canvas,e)
-        })
-
-        this.toolPos = [0,0]
-        this.toolBar.addEventListener("mousemove",(e) => {
-            this.toolPos = this.getMousePosition(this.toolBar,e)
-        })
-        this.toolBar.addEventListener("mousedown",(e) => {
             if (this.hoverIndex != -1)
                 if (this.hoverIndex == this.selectedIndex)
                     this.selectedIndex = -1
                 else
                     this.selectedIndex = this.hoverIndex
-            this.placeDraw(this.selectedIndex != -1)
+        this.placeDraw(this.selectedIndex != -1)
         })
-        this.toolBar.addEventListener("mouseleave",(e) => {
+
+        this.toolPos = [0,0]
+        this.canvas.addEventListener("mousemove",(e) => {
+            this.toolPos = this.getMousePosition(this.canvas,e)
+        })
+
+        this.canvas.addEventListener("mouseleave",(e) => {
             this.toolPos = [0,0]
         })
 
-        this.animate()
+        this.floor = this.canvas.height-64
+
+        //animation
+        this.updateGrid()
         this.toolAnimateInterval = setInterval(this.toolAnimate,64)
         this.animateInterval = setInterval(this.animate,1000)
     }
@@ -112,17 +120,17 @@ class GameSystem
 
     toolUpdate()
     {
-        let toolDraw = this.toolBar.getContext("2d")
-        this.drawImageWithScale(toolDraw,"./img/ui/Toolbar.png",0,0,320,64)
+        let toolDraw = this.canvas.getContext("2d")
+        this.drawImageWithScale(toolDraw,"./img/ui/Toolbar.png",0,this.floor,320,64)
         let found = false
         if (this.selectedIndex != -1)
-            this.drawImageWithScale(toolDraw,"./img/ui/selected.png",this.selectableTool[this.selectedIndex][0],this.selectableTool[this.selectedIndex][1],40,40)
+            this.drawImageWithScale(toolDraw,"./img/ui/selected.png",this.selectableTool[this.selectedIndex][0],this.selectableTool[this.selectedIndex][1]+this.floor,40,40)
         for (let i in this.selectableTool)
         {
             let pos = this.selectableTool[i]
             
-            if (withinBounds(pos[0],pos[1],40,40,this.toolPos[0],this.toolPos[1])) {
-                this.drawImageWithScale(toolDraw,"./img/ui/hover.png",this.selectableTool[i][0],this.selectableTool[i][1],40,40)
+            if (withinBounds(pos[0],pos[1]+this.floor,40,40,this.toolPos[0],this.toolPos[1])) {
+                this.drawImageWithScale(toolDraw,"./img/ui/hover.png",this.selectableTool[i][0],this.selectableTool[i][1]+this.floor,40,40)
                 this.hoverIndex = i
                 found = true
             }
@@ -133,8 +141,6 @@ class GameSystem
 
     animate()
     {
-        gameSystem.animationFrame++
-        gameSystem.animationFrame%=2
         gameSystem.updateGrid()
     }
 
@@ -150,11 +156,14 @@ class GameSystem
         let size = this.tileGrid.length
         drawer.fillStyle = "#4db938"
         drawer.fillRect(0,0,this.canvas.width,this.canvas.height)
+        this.toolUpdate()
+        let sideOffset = (this.canvas.width-this.gameSize.x)/2
+        console.log(sideOffset)
         for(let ix = 0;ix<size;ix++)
             for(let iy = 0;iy<size;iy++)
             {
-                let x = ((tilesize.x/2)*(size-2)+(tilesize.x/2)*ix-tilesize.y*iy+this.margin)
-                let y = ((tilesize.y/2)*ix+(tilesize.y/2)*iy+this.margin-tilesize.x+64)
+                let x = ((tilesize.x/2)*(size-2)+(tilesize.x/2)*ix-tilesize.y*iy+this.offset[0]+sideOffset)
+                let y = ((tilesize.y/2)*ix+(tilesize.y/2)*iy-tilesize.x+this.offset[1])
                 if (this.tileGrid[ix][iy] == null) {
                     if (this.drawPlace) 
                         this.drawImage(drawer,"./img/buildings/empty.png",x,y)
