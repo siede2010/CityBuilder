@@ -84,7 +84,6 @@ class GameSystem
         this.canvas.width = canvasX;
         this.canvas.height = canvasY;
         getElementById(this.parent,"row1").append(this.canvas)
-        this.parent.append(this.toolBar)
 
         //Events
         this.canvas.addEventListener("mousedown",(e) => {
