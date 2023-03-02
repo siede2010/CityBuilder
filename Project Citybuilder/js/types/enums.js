@@ -20,3 +20,11 @@ let colors = {
     red : "bg-danger",
     dark : "bg-dark"
 }
+let type = {
+    security : "security",
+    nature : "nature",
+    population : "population",
+    work : "work",
+    happiness : "happiness",
+    none : "none"
+}

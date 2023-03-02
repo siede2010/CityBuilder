@@ -49,6 +49,7 @@ class BuildingType
         this.name = name
         this.heightDiff = 0
         this.stats = []
+        this.type = type.none
         this.turnable = false
         for(let i in stats)
             this.stats.push([stats[i],0])
