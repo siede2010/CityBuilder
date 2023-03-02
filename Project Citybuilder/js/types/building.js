@@ -67,6 +67,7 @@ class BuildingType
     getThis(executable)
     {
         executable.call(null,this)
+        return this
     }
 
     build()
