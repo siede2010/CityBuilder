@@ -63,6 +63,12 @@ class BuildingType
         this.getStat(stat)[1] = value
         return this
     }
+
+    getThis(executable)
+    {
+        executable.call(null,this)
+    }
+
     build()
     {
         return new Building(this)

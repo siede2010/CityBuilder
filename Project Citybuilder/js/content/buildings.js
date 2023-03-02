@@ -1,10 +1,13 @@
-let apartment
+let apartment,forrest
 function buildings()
 {
-    apartment = new BuildingType("apartment")
-    .setStat(stats.food,-1)
-    .setStat(stats.polution,1)
-    .setStat(stats.energy,-1)
-    .setStat(stats.cost,3)
-    apartment.heightDiff = 32
+    
+    apartment = new BuildingType("apartment").getThis((self) => {
+    self.setStat(stats.food,-1)
+    self.setStat(stats.polution,1)
+    self.setStat(stats.energy,-1)
+    self.setStat(stats.cost,3)
+    self.turnable = true
+    self.heightDiff = 32
+    })
 }
