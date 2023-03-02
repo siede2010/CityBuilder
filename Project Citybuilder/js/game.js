@@ -204,15 +204,14 @@ function initiateTutorial()
     document.body.append(gameUI)
     gameSystem = new GameSystem(4,30,gameUI,gameStats)
     addBar(bars,gameStats[0][1]).className += colors.lime
-    addBar(bars,gameStats[1][1])
-    addBar(bars,gameStats[2][1])
-    addBar(bars,gameStats[3][1])
-    addBar(bars,gameStats[4][1])
-    addBar(bars,gameStats[5][1])
-    addBar(bars,gameStats[6][1])
-    addBar(bars,gameStats[7][1])
-    addBar(bars,gameStats[8][1])
-    addBar(bars,gameStats[9][1])
-    addBar(bars,gameStats[10][1])
-    addBar(bars,gameStats[11][1])
+    addBar(bars,gameStats[1][1]).className += colors.turkis
+    addBar(bars,gameStats[2][1]).className += colors.lime
+    addBar(bars,gameStats[3][1]).className += colors.red
+    addBar(bars,gameStats[4][1]).className += colors.yellow
+    addBar(bars,gameStats[5][1]).className += colors.yellow
+    addBar(bars,gameStats[6][1]).className += colors.turkis
+    addBar(bars,gameStats[7][1]).className += colors.blue
+    addBar(bars,gameStats[8][1]).className += colors.lime
+    addBar(bars,gameStats[9][1]).className += colors.yellow
+    addBar(bars,gameStats[11][1]).className += colors.lime
 }
