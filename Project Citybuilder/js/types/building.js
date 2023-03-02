@@ -75,6 +75,13 @@ class BuildingType
         return this
     }
 
+    getSprite()
+    {
+        if (this.turnable)
+            return "./img/buildings/" + this.name + "/" + this.name + "-0.png"
+        return "./img/buildings/" + this.name + "/" + this.name + ".png"
+    }
+
     build()
     {
         return new Building(this)

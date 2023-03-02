@@ -57,6 +57,27 @@ class GameSystem
             [156,16],
             [202,16],
         ]
+        this.typeOrder = [
+            type.security,
+            type.nature,
+            type.population,
+            type.work,
+            type.happiness
+        ]
+        this.towers = {
+            security : getBuildingsOfType(type.security),
+            nature : getBuildingsOfType(type.nature),
+            population : getBuildingsOfType(type.population),
+            work : getBuildingsOfType(type.work),
+            happiness : getBuildingsOfType(type.happiness)
+        }
+        this.selectedTower = {
+            security : this.towers.security.length == 0 ? null : this.towers.security[0],
+            nature : this.towers.nature.length == 0 ? null : this.towers.nature[0],
+            population : this.towers.population.length == 0 ? null : this.towers.population[0],
+            work :  this.towers.work.length == 0 ? null : this.towers.work[0],
+            happiness : this.towers.happiness.length == 0 ? null : this.towers.happiness[0]
+        }
         this.hoverIndex = -1
         this.selectedIndex = -1
         this.offset = [24,96]
@@ -124,6 +145,17 @@ class GameSystem
         let toolDraw = this.canvas.getContext("2d")
         let toolOffset = (this.canvas.width - 320)/2
         this.drawImageWithScale(toolDraw,"./img/ui/Toolbar.png",toolOffset,this.floor,320,64)
+        let i = 0
+        this.typeOrder.forEach(type => {
+            if (this.selectedTower[type] != null)
+                this.drawImage(
+                    toolDraw,
+                    this.selectedTower[type].getSprite(),
+                    this.selectableTool[i][0] + toolOffset + 4,
+                    this.selectableTool[i][1] + this.floor - this.selectedTower[type].heightDiff / 2
+                )
+            i++
+        })
         let found = false
         if (this.selectedIndex != -1)
             this.drawImageWithScale(toolDraw,"./img/ui/selected.png",this.selectableTool[this.selectedIndex][0]+toolOffset,this.selectableTool[this.selectedIndex][1]+this.floor,40,40)
