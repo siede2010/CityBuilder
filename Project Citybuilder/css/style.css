@@ -26,3 +26,15 @@
 #gameUi{
     height: 100%;
 }
+#row1 {
+    display:flex;
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    transform: translate(0, -50%);
+    justify-content: center;
+}
+
+body {
+    background-color: darkslategray;
+}

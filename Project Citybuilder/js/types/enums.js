@@ -1,16 +1,16 @@
 let stats = {
-    happiness:"happiness",
-    polution:"polution",
-    nature:"nature",
-    safety:"safety",
-    work:"work",
-    food:"food",
-    economics:"economics",
-    energy:"energy",
-    healthCare:"healthCare",
-    education:"education",
-    cost:"cost",
-    trust:"trust"
+    happiness:"Happiness",
+    polution:"Polution",
+    nature:"Nature",
+    safety:"Safety",
+    work:"Work",
+    food:"Food",
+    economics:"Economics",
+    energy:"Energy",
+    healthCare:"HealthCare",
+    education:"Education",
+    cost:"Cost",
+    trust:"Trust"
 }
 let colors = {
     blue : "",
