@@ -114,7 +114,7 @@ class GameSystem
             if (withinBounds(pos[0],pos[1],40,40,this.toolPos[0],this.toolPos[1])) {
                 this.drawImageWithScale(toolDraw,"./img/ui/hover.png",this.selectableTool[i][0],this.selectableTool[i][1],40,40)
                 this.hoverIndex = i
-                found = ture
+                found = true
             }
         }
         if (!found)
