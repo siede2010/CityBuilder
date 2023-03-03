@@ -50,6 +50,7 @@ class GameSystem
         this.clickPos = [0,0]
         this.parent = vessel;
         gameSystem = this
+        this.selectedArrow = 0
         this.selectableTool = [
             [14,16],
             [60,16],
@@ -72,11 +73,11 @@ class GameSystem
             happiness : getBuildingsOfType(type.happiness)
         }
         this.selectedTower = {
-            security : this.towers.security.length == 0 ? null : this.towers.security[0],
-            nature : this.towers.nature.length == 0 ? null : this.towers.nature[0],
-            population : this.towers.population.length == 0 ? null : this.towers.population[0],
-            work :  this.towers.work.length == 0 ? null : this.towers.work[0],
-            happiness : this.towers.happiness.length == 0 ? null : this.towers.happiness[0]
+            security : 0,
+            nature : 0,
+            population : 0,
+            work :  0,
+            happiness : 0
         }
         this.hoverIndex = -1
         this.selectedIndex = -1
@@ -145,15 +146,17 @@ class GameSystem
         let toolDraw = this.canvas.getContext("2d")
         let toolOffset = (this.canvas.width - 320)/2
         this.drawImageWithScale(toolDraw,"./img/ui/Toolbar.png",toolOffset,this.floor,320,64)
+        let arrowOffset = 256
         let i = 0
         this.typeOrder.forEach(type => {
-            if (this.selectedTower[type] != null)
+            if (this.towers[type].length > 0) {
                 this.drawImage(
                     toolDraw,
-                    this.selectedTower[type].getSprite(),
+                    this.towers[type][this.selectedTower[type]].getSprite(),
                     this.selectableTool[i][0] + toolOffset + 4,
-                    this.selectableTool[i][1] + this.floor - this.selectedTower[type].heightDiff / 2
+                    this.selectableTool[i][1] + this.floor
                 )
+            }
             i++
         })
         let found = false
@@ -171,6 +174,23 @@ class GameSystem
         }
         if (!found)
             this.hoverIndex = -1
+        let arrowIcon = this.floor > this.toolPos[1] || 
+            toolOffset + arrowOffset > this.toolPos[0] || 
+            toolOffset + 320 < this.toolPos[0] ? null :
+            this.floor + 32 > this.toolPos[1] ?
+                "./img/ui/Toolbar-arrow-up.png" :
+                "./img/ui/Toolbar-arrow-down.png"
+        if (this.selectedIndex != -1)
+        {
+            if (arrowIcon == "./img/ui/Toolbar-arrow-up.png")
+                this.selectedArrow = 1
+            else
+                this.selectedArrow = 2
+            this.drawImageWithScale(toolDraw,arrowIcon,toolOffset,this.floor,320,64)
+        }
+        else
+            this.selectedArrow = 0
+        this.drawImageWithScale(toolDraw,"./img/ui/Toolbar-lowBar.png",toolOffset,this.floor,320,64)
     }
 
     animate()
@@ -192,7 +212,6 @@ class GameSystem
         drawer.fillRect(0,0,this.canvas.width,this.canvas.height)
         this.toolUpdate()
         let sideOffset = (this.canvas.width-this.gameSize.x)/2
-        console.log(sideOffset)
         for(let ix = 0;ix<size;ix++)
             for(let iy = 0;iy<size;iy++)
             {
