@@ -18,7 +18,7 @@ function addBar(ui,trackValue)
     barOut.append(barIn)
     ui.append(barOut)
     barOut.className = "progress progress-bar-striped bg-dark"
-    barOut.style = "margin:4px"
+    barOut.style = "margin:4px;"
     barIn.className = "progress-bar progress-bar-striped "
     let b = document.createElement("b")
     barIn.append(b)
@@ -29,11 +29,16 @@ function addBar(ui,trackValue)
         b.innerText = ""
     })
     barUpdates.push([setInterval(updateBar,100),trackValue,barIn])
+    barIn.color = function(colorstring)
+    {
+        this.style = "background-color: #" + colorstring + ";"
+        console.log(this.style)
+    }
     return barIn
 }
 function updateBar()
 {
-    barUpdates[barIndex][2].style = "width :" + barUpdates[barIndex++][1].getVar() + "%"
+    barUpdates[barIndex][2].style.width = barUpdates[barIndex++][1].getVar() + "%"
     barIndex%=barUpdates.length
 }
 
@@ -143,11 +148,16 @@ class GameSystem
 
     toolUpdate()
     {
+        //Static Variables
         let toolDraw = this.canvas.getContext("2d")
         let toolOffset = (this.canvas.width - 320)/2
-        this.drawImageWithScale(toolDraw,"./img/ui/Toolbar.png",toolOffset,this.floor,320,64)
         let arrowOffset = 256
         let i = 0
+        let found = false
+        //DrawToolbar
+        this.drawImageWithScale(toolDraw,"./img/ui/Toolbar.png",toolOffset,this.floor,320,64)
+
+        //drawBuilding
         this.typeOrder.forEach(type => {
             if (this.towers[type].length > 0) {
                 this.drawImage(
@@ -159,7 +169,8 @@ class GameSystem
             }
             i++
         })
-        let found = false
+
+        //Selected Draw
         if (this.selectedIndex != -1)
             this.drawImageWithScale(toolDraw,"./img/ui/selected.png",this.selectableTool[this.selectedIndex][0]+toolOffset,this.selectableTool[this.selectedIndex][1]+this.floor,40,40)
         for (let i in this.selectableTool)
@@ -172,6 +183,8 @@ class GameSystem
                 found = true
             }
         }
+
+        //Draw Arrows
         if (!found)
             this.hoverIndex = -1
         let arrowIcon = this.floor > this.toolPos[1] || 
@@ -190,6 +203,8 @@ class GameSystem
         }
         else
             this.selectedArrow = 0
+
+        //Cut off buildings
         this.drawImageWithScale(toolDraw,"./img/ui/Toolbar-lowBar.png",toolOffset,this.floor,320,64)
     }
 
@@ -259,23 +274,17 @@ function initiateGame()
     m.remove()
     document.body.append(gameUI)
     gameSystem = new GameSystem(10,30,gameUI,gameStats)
-    addBar(bars,gameStats[0][1]).className += colors.lime
-    addBar(bars,gameStats[1][1]).className += colors.turkis
-    addBar(bars,gameStats[2][1]).className += colors.lime
-    addBar(bars,gameStats[3][1]).className += colors.red
-    addBar(bars,gameStats[4][1]).className += colors.yellow
-    addBar(bars,gameStats[5][1]).className += colors.yellow
-    addBar(bars,gameStats[6][1]).className += colors.turkis
-    addBar(bars,gameStats[7][1]).className += colors.blue
-    addBar(bars,gameStats[8][1]).className += colors.lime
-    addBar(bars,gameStats[9][1]).className += colors.yellow
-    addBar(bars,gameStats[11][1]).className += colors.lime
+    loadBars()
 }
 function initiateTutorial()
 {
     m.remove()
     document.body.append(gameUI)
     gameSystem = new GameSystem(4,30,gameUI,gameStats)
+    loadBars()
+}
+function loadBars()
+{
     addBar(bars,gameStats[0][1]).className += colors.lime
     addBar(bars,gameStats[1][1]).className += colors.turkis
     addBar(bars,gameStats[2][1]).className += colors.lime
@@ -285,6 +294,6 @@ function initiateTutorial()
     addBar(bars,gameStats[6][1]).className += colors.turkis
     addBar(bars,gameStats[7][1]).className += colors.blue
     addBar(bars,gameStats[8][1]).className += colors.lime
-    addBar(bars,gameStats[9][1]).className += colors.yellow
+    addBar(bars,gameStats[9][1]).color("00DD99")
     addBar(bars,gameStats[11][1]).className += colors.lime
 }
