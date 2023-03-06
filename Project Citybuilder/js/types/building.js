@@ -40,7 +40,7 @@ class Building
 
     getSprite()
     {
-        if (turnable)
+        if (this.source.turnable)
             return "./img/buildings/" + this.name + "/" + this.name + "-" + this.rotation + ".png"
         return "./img/buildings/" + this.name + "/" + this.name + ".png"
     }
@@ -75,10 +75,10 @@ class BuildingType
         return this
     }
 
-    getSprite()
+    getSprite(rotation)
     {
         if (this.turnable)
-            return "./img/buildings/" + this.name + "/" + this.name + "-0.png"
+            return "./img/buildings/" + this.name + "/" + this.name + "-"+rotation+".png"
         return "./img/buildings/" + this.name + "/" + this.name + ".png"
     }
 

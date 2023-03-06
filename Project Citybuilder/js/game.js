@@ -52,7 +52,12 @@ class GameSystem
         let canvasY = size*tilesize.y+64+64;
         this.margin = margin;
         this.drawPlace = false
+        this.buildrotation = 0
         this.clickPos = [0,0]
+        this.gridSelected = {
+            x:-1,
+            y:-1
+        }
         this.parent = vessel;
         gameSystem = this
         this.selectedArrow = 0
@@ -114,9 +119,18 @@ class GameSystem
         this.canvas.height = canvasY;
         getElementById(this.parent,"row1").append(this.canvas)
 
+    
+
         //Events
         this.canvas.addEventListener("mousedown",(e) => {
             this.clickPos = this.getMousePosition(this.canvas,e)
+            
+            if (this.gridSelected.x != -1 && this.gridSelected.y != -1 && this.selectedIndex != -1)
+            {
+                console.log(this.towers[this.typeOrder[this.selectedIndex]])
+                this.tileGrid[this.gridSelected.x][this.gridSelected.y] = this.towers[this.typeOrder[this.selectedIndex]][this.selectedTower[this.typeOrder[this.selectedIndex]]].build(this.buildrotation)
+            }
+            //Index Select
             if (this.hoverIndex != -1)
                 if (this.hoverIndex == this.selectedIndex)
                     this.selectedIndex = -1
@@ -125,13 +139,31 @@ class GameSystem
         this.placeDraw(this.selectedIndex != -1)
         })
 
-        this.toolPos = [0,0]
+        document.addEventListener("keypress",(e) => {
+            console.log(e.key)
+            if (e.key == "e") {
+                this.buildrotation += 1
+                this.buildrotation %= 4
+            }
+            else if (e.key == "q") {
+                this.buildrotation -= 1
+                if (this.buildrotation < 0)
+                    this.buildrotation = 3
+            }
+            this.updateGrid()
+        })
+
+        this.MousePos = [0,0]
         this.canvas.addEventListener("mousemove",(e) => {
-            this.toolPos = this.getMousePosition(this.canvas,e)
+            this.MousePos = this.getMousePosition(this.canvas,e)
+            this.updateGrid()
         })
 
         this.canvas.addEventListener("mouseleave",(e) => {
-            this.toolPos = [0,0]
+            this.MousePos = [0,0]
+            this.gridSelected.x = -1
+            this.gridSelected.y = -1
+            this.updateGrid()
         })
 
         this.floor = this.canvas.height-64
@@ -162,7 +194,7 @@ class GameSystem
             if (this.towers[type].length > 0) {
                 this.drawImage(
                     toolDraw,
-                    this.towers[type][this.selectedTower[type]].getSprite(),
+                    this.towers[type][this.selectedTower[type]].getSprite(0),
                     this.selectableTool[i][0] + toolOffset + 4,
                     this.selectableTool[i][1] + this.floor
                 )
@@ -177,7 +209,7 @@ class GameSystem
         {
             let pos = this.selectableTool[i]
             
-            if (withinBounds(pos[0]+toolOffset,pos[1]+this.floor,40,40,this.toolPos[0],this.toolPos[1])) {
+            if (withinBounds(pos[0]+toolOffset,pos[1]+this.floor,40,40,this.MousePos[0],this.MousePos[1])) {
                 this.drawImageWithScale(toolDraw,"./img/ui/hover.png",this.selectableTool[i][0]+toolOffset,this.selectableTool[i][1]+this.floor,40,40)
                 this.hoverIndex = i
                 found = true
@@ -187,10 +219,10 @@ class GameSystem
         //Draw Arrows
         if (!found)
             this.hoverIndex = -1
-        let arrowIcon = this.floor > this.toolPos[1] || 
-            toolOffset + arrowOffset > this.toolPos[0] || 
-            toolOffset + 320 < this.toolPos[0] ? null :
-            this.floor + 32 > this.toolPos[1] ?
+        let arrowIcon = this.floor > this.MousePos[1] || 
+            toolOffset + arrowOffset > this.MousePos[0] || 
+            toolOffset + 320 < this.MousePos[0] ? null :
+            this.floor + 32 > this.MousePos[1] ?
                 "./img/ui/Toolbar-arrow-up.png" :
                 "./img/ui/Toolbar-arrow-down.png"
         if (this.selectedIndex != -1)
@@ -206,6 +238,32 @@ class GameSystem
 
         //Cut off buildings
         this.drawImageWithScale(toolDraw,"./img/ui/Toolbar-lowBar.png",toolOffset,this.floor,320,64)
+    }
+
+    drawSelect()
+    {
+        let selDraw = this.canvas.getContext("2d")
+
+        selDraw.font = "18px serif";
+        let x = (this.MousePos[0] - (this.canvas.width-this.gameSize.x)/2 - this.tileGrid.length * tilesize.x/2)
+        let y = this.MousePos[1] - this.margin - tilesize.y
+        let gridX = Math.floor((x/2 + y) / (tilesize.x/2))
+        let gridY = Math.floor((-x/2 + y) / (tilesize.x/2))
+        let gridSize = this.tileGrid.length
+        if (gridX >= 0 && gridY >= 0 && gridX < gridSize && gridY < gridSize && this.selectedIndex != -1 && this.tileGrid[gridX][gridY] == null) {
+            selDraw.globalAlpha = 0.6
+            let block = this.towers[this.typeOrder[this.selectedIndex]][this.selectedTower[this.typeOrder[this.selectedIndex]]]
+            this.drawImage(selDraw,block.getSprite(this.buildrotation),(this.canvas.width-this.gameSize.x)/2 + this.tileGrid.length * tilesize.x/2+gridX*tilesize.x/2 - gridY *tilesize.x/2 - tilesize.x/2+8,this.margin+gridY * tilesize.y/2 + gridX * tilesize.y/2+tilesize.y-block.heightDiff-6)
+            // ---------------------------------Debug tool----------------------------------------- //
+            // selDraw.strokeText("["+ gridX + "|" + gridY+"]", this.MousePos[0], this.MousePos[1]) //
+            // ------------------------------------------------------------------------------------ //
+            selDraw.globalAlpha = 1
+            this.gridSelected.x = gridX
+            this.gridSelected.y = gridY
+        } else {
+            this.gridSelected.x = -1
+            this.gridSelected.y = -1
+        }
     }
 
     animate()
@@ -239,6 +297,9 @@ class GameSystem
                 else
                     this.drawImage(drawer,this.tileGrid[ix][iy].getSprite(),x+8,y-this.tileGrid[ix][iy].source.heightDiff)
             }
+
+        if (this.MousePos.filter(i => i==0).length == 0)
+            this.drawSelect()
     }
 
     placeDraw(bool)
