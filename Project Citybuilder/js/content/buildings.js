@@ -1,22 +1,27 @@
-let apartment,forest
+let apartment,forest,road,smallHospital
 function buildings()
 {
     
     apartment = new BuildingType("apartment").getThis((self) => {
-    self.setStat(stats.food,-1)
-    self.setStat(stats.polution,1)
-    self.setStat(stats.energy,-1)
-    self.setStat(stats.cost,3)
-    self.type = type.population
-    self.turnable = true
-    self.heightDiff = 32
-    })
-    forest = new BuildingType("forest").getThis((self) => {
         self.setStat(stats.food,-1)
         self.setStat(stats.polution,1)
         self.setStat(stats.energy,-1)
         self.setStat(stats.cost,3)
+        self.type = type.population
+        self.turnable = true
+        self.heightDiff = 32
+    })
+    forest = new BuildingType("forest").getThis((self) => {
+        self.setStat(stats.food,0)
         self.type = type.nature
         self.turnable = false
-        })
+    })
+    smallHospital = new BuildingType("small-hospital").getThis((self) => {
+        self.turnable = false
+        self.type = type.security
+        self.heightDiff = 14
+    })
+    road = new RoadType("road").getThis((self) => {
+        self.type = type.security
+    })
 }
