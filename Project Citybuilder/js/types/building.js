@@ -19,6 +19,11 @@ class Building
             this.extraStats.push([stats[i],0])
     }
 
+    spriteOffset = function()
+    {
+        return this.source.spriteOffset()
+    }
+
     getStat(stat)
     {
         return [stat,this.source.stats.filter(p => p[0] == stat)[0][1] + this.extraStats.filter(p => p[0] == stat)[0][1]]
@@ -64,6 +69,12 @@ class BuildingType
     {
         return this.stats.filter(p => p[0] == stat)[0]
     }
+
+    spriteOffset()
+    {
+        return [8,0]
+    }
+
     setStat(stat,value)
     {
         this.getStat(stat)[1] = value
@@ -119,14 +130,24 @@ class Road extends Building
     {
         let i = 0
         let c = null
+        let top = gameSystem.tileGrid[this.position.x][this.position.y]
+        let blocked = [false,false]
+        if (top != null) {
+            if (top instanceof Reference) {
+                if (top.getRef().position.x > this.position.x)
+                    blocked[1] = true
+                if (top.getRef().position.y > this.position.y)
+                    blocked[0] = true
+            }
+        }
         if (this.position.x != 0)
             c = gameSystem.tileGridUnder[this.position.x-1][this.position.y]
-        if (this.position.x > 0 && c != null && c.source == this.source)
+        if (!blocked[0] && this.position.x > 0 && c != null && c.source == this.source)
             i+=1
         c = null
         if (this.position.y != 0)
             c = gameSystem.tileGridUnder[this.position.x][this.position.y-1]
-        if (this.position.y > 0 && c != null && c.source == this.source)
+        if (!blocked[1] && this.position.y > 0 && c != null && c.source == this.source)
             i+=2
         return "./img/road/" + this.name + "-" + i + ".png"
     }
@@ -143,6 +164,10 @@ class RoadType extends BuildingType
     {
         return "./img/road/" + this.name + "-1.png"
     }
+    spriteOffset = function()
+    {
+        return [0,0]
+    }
     getSprite = function(r)
     {
         return "./img/road/" + this.name + "-3.png"
@@ -151,4 +176,75 @@ class RoadType extends BuildingType
     {
         return new Road(this,position)
     }
+}
+class MultiBuilding extends Building
+{
+    constructor(source,position,rotation)
+    {
+        super(source)
+        this.rotation = rotation
+        let other = this.rotation%2 == 0
+        this.position = {
+            x: position%gameSystem.tileGrid.length,
+            y: Math.floor(position/gameSystem.tileGrid.length)
+        } 
+        this.dim = {
+            w: other ? this.source.width : this.source.height,
+            h: other ? this.source.height : this.source.width
+        }
+        for(let ix = 0;ix < this.dim.w;ix++)
+            for(let iy = 0;iy < this.dim.h;iy++)
+            {
+                console.log(ix+"|"+iy)
+                if (gameSystem.tileGrid[this.position.x - ix][this.position.y - iy] == this) continue
+                gameSystem.tileGrid[this.position.x - ix][this.position.y - iy] = new Reference(this)
+            }
+    }
+
+    spriteOffset = function()
+    {
+        return [this.rotation%2*-24,0]
+    }
+
+    getSprite = function()
+    {
+        if (this.source.turnable)
+            return "./img/buildings/" + this.name + "/" + this.name + "-" + this.rotation + ".png"
+        return "./img/buildings/" + this.name + "/" + this.name + ".png"
+    }
+}
+class MultiBlockType extends BuildingType
+{
+    constructor(name)
+    {
+        super(name)
+        this.width = 1
+        this.height = 1
+    }
+    spriteOffset = function()
+    {
+        return [gameSystem.buildrotation%2*-24,0]
+    }
+    getIcon = function()
+    {
+        return "./img/buildings/" + this.name + "/" + this.name + "-icon.png"
+    }
+    build = function(rotation,position)
+    {
+        return new MultiBuilding(this,position,rotation)
+    }
+}
+class Reference
+{
+    constructor(ref)
+    {
+        this.source = ref.source
+        this.ref = ref
+    }
+    getRef()
+    {
+        return this.ref
+    }
+    getSprite() {return ""}
+    spriteOffset() {return [0,0]}
 }

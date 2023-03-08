@@ -1,4 +1,4 @@
-let apartment,forest,road,smallHospital
+let apartment,forest,road,smallHospital,house
 function buildings()
 {
     
@@ -20,6 +20,12 @@ function buildings()
         self.turnable = false
         self.type = type.security
         self.heightDiff = 14
+    })
+    house = new MultiBlockType("house").getThis((self) => {
+        self.turnable = true
+        self.type = type.population
+        self.heightDiff = 16
+        self.height = 2
     })
     road = new RoadType("road").getThis((self) => {
         self.type = type.security

@@ -270,11 +270,26 @@ class GameSystem
             this.selectedIndex != -1
             ) {
                 let block = this.towers[this.typeOrder[this.selectedIndex]][this.selectedTower[this.typeOrder[this.selectedIndex]]]
-                if (this.tileGrid[gridX][gridY] == null && block != null && !block.floor)
+                if (
+                    (
+                        this.tileGrid[gridX][gridY] == null 
+                        && 
+                        block != null 
+                        && 
+                        !block.floor 
+                    ) 
+                    || 
+                    (
+                        this.tileGridUnder[gridX][gridY] == null 
+                        && 
+                        block != null 
+                        && 
+                        block.floor
+                    )
+                   )
                 {
                     selDraw.globalAlpha = 0.6
-                    if (block != null)
-                        this.drawImage(selDraw,block.getSprite(this.buildrotation),(this.canvas.width-this.gameSize.x)/2 + this.tileGrid.length * tilesize.x/2+gridX*tilesize.x/2 - gridY *tilesize.x/2 - tilesize.x/2+8,this.margin+gridY * tilesize.y/2 + gridX * tilesize.y/2+tilesize.y-block.heightDiff-6)
+                    this.drawImage(selDraw,block.getSprite(this.buildrotation),(this.canvas.width-this.gameSize.x)/2 + this.tileGrid.length * tilesize.x/2+gridX*tilesize.x/2 - gridY *tilesize.x/2 - tilesize.x/2+block.spriteOffset()[0],this.margin+gridY * tilesize.y/2 + gridX * tilesize.y/2+tilesize.y-6-block.heightDiff-block.spriteOffset()[1])
                     // ---------------------------------Debug tool----------------------------------------- //
                     // selDraw.strokeText("["+ gridX + "|" + gridY+"]", this.MousePos[0], this.MousePos[1]) //
                     // ------------------------------------------------------------------------------------ //
@@ -282,18 +297,10 @@ class GameSystem
                     this.gridSelected.x = gridX
                     this.gridSelected.y = gridY
                 }
-                else if (this.tileGridUnder[gridX][gridY] == null && block != null && block.floor)
+                else
                 {
-                    selDraw.globalAlpha = 0.6
-                    let block = this.towers[this.typeOrder[this.selectedIndex]][this.selectedTower[this.typeOrder[this.selectedIndex]]]
-                    if (block != null)
-                        this.drawImage(selDraw,block.getSprite(this.buildrotation),(this.canvas.width-this.gameSize.x)/2 + this.tileGrid.length * tilesize.x/2+gridX*tilesize.x/2 - gridY *tilesize.x/2 - tilesize.x/2,this.margin+gridY * tilesize.y/2 + gridX * tilesize.y/2+tilesize.y-block.heightDiff-6)
-                    // ---------------------------------Debug tool----------------------------------------- //
-                    // selDraw.strokeText("["+ gridX + "|" + gridY+"]", this.MousePos[0], this.MousePos[1]) //
-                    // ------------------------------------------------------------------------------------ //
-                    selDraw.globalAlpha = 1
-                    this.gridSelected.x = gridX
-                    this.gridSelected.y = gridY
+                    this.gridSelected.x = -1
+                    this.gridSelected.y = -1
                 }
             }
             else
@@ -336,7 +343,7 @@ class GameSystem
                             this.drawImage(drawer,"./img/buildings/empty.png",x,y)
                     }
                     else
-                        this.drawImage(drawer,this.tileGridUnder[ix][iy].getSprite(),x,y-this.tileGridUnder[ix][iy].source.heightDiff)
+                        this.drawImage(drawer,this.tileGridUnder[ix][iy].getSprite(),x+this.tileGridUnder[ix][iy].spriteOffset()[0],y-this.tileGridUnder[ix][iy].source.heightDiff+this.tileGridUnder[ix][iy].spriteOffset()[1])
                 }
         //Top
         for(let ix = 0;ix<size;ix++)
@@ -349,7 +356,7 @@ class GameSystem
                         this.drawImage(drawer,"./img/buildings/empty.png",x,y)
                 }
                 else
-                    this.drawImage(drawer,this.tileGrid[ix][iy].getSprite(),x+8,y-this.tileGrid[ix][iy].source.heightDiff)
+                    this.drawImage(drawer,this.tileGrid[ix][iy].getSprite(),x+this.tileGrid[ix][iy].spriteOffset()[0],y-this.tileGrid[ix][iy].source.heightDiff+this.tileGrid[ix][iy].spriteOffset()[1])
             }
 
         if (this.MousePos.filter(i => i==0).length == 0)
