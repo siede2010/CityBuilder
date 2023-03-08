@@ -140,13 +140,32 @@ class GameSystem
                     this.selectedIndex = -1
                 else
                     this.selectedIndex = this.hoverIndex
-            if (this.selectedArrow == 1)
+            if (this.selectedIndex == -1)
             {
-                this.selectedTower[this.typeOrder[this.selectedIndex]] = ++this.selectedTower[this.typeOrder[this.selectedIndex]] % this.towers[this.typeOrder[this.selectedIndex]].length
+                if (this.selectedArrow == 1)
+                {
+                    for (let i in this.selectedTower)
+                    {
+                        this.selectedTower[i] = ++this.selectedTower[i] % this.towers[i].length
+                    }
+                }
+                else if (this.selectedArrow == 2)
+                {
+                    for (let i in this.selectedTower)
+                    {
+                        this.selectedTower[i] = --this.selectedTower[i] < 0 ? this.towers[i].length-1 : this.selectedTower[i]
+                    }
+                }
             }
-            else if (this.selectedArrow == 2)
-            {
-                this.selectedTower[this.typeOrder[this.selectedIndex]] = --this.selectedTower[this.typeOrder[this.selectedIndex]] < 0 ? this.towers[this.typeOrder[this.selectedIndex]].length-1 : this.selectedTower[this.typeOrder[this.selectedIndex]]
+            else {
+                if (this.selectedArrow == 1)
+                {
+                    this.selectedTower[this.typeOrder[this.selectedIndex]] = ++this.selectedTower[this.typeOrder[this.selectedIndex]] % this.towers[this.typeOrder[this.selectedIndex]].length
+                }
+                else if (this.selectedArrow == 2)
+                {
+                    this.selectedTower[this.typeOrder[this.selectedIndex]] = --this.selectedTower[this.typeOrder[this.selectedIndex]] < 0 ? this.towers[this.typeOrder[this.selectedIndex]].length-1 : this.selectedTower[this.typeOrder[this.selectedIndex]]
+                }
             }
         this.placeDraw(this.selectedIndex != -1)
         })
@@ -237,7 +256,7 @@ class GameSystem
             this.floor + 32 > this.MousePos[1] ?
                 "./img/ui/Toolbar-arrow-up.png" :
                 "./img/ui/Toolbar-arrow-down.png"
-        if (this.selectedIndex != -1 && arrowIcon != null)
+        if (arrowIcon != null)
         {
             if (arrowIcon == "./img/ui/Toolbar-arrow-up.png")
                 this.selectedArrow = 1

@@ -26,6 +26,7 @@ function buildings()
         self.type = type.population
         self.heightDiff = 16
         self.height = 2
+        self.width = 1
     })
     road = new RoadType("road").getThis((self) => {
         self.type = type.security
