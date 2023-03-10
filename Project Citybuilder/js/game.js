@@ -291,19 +291,19 @@ class GameSystem
                 let block = this.towers[this.typeOrder[this.selectedIndex]][this.selectedTower[this.typeOrder[this.selectedIndex]]]
                 if (
                     (
-                        this.tileGrid[gridX][gridY] == null 
-                        && 
                         block != null 
                         && 
                         !block.floor 
+                        &&
+                        block.canPlace(gridX,gridY)
                     ) 
                     || 
                     (
-                        this.tileGridUnder[gridX][gridY] == null 
-                        && 
                         block != null 
                         && 
                         block.floor
+                        &&
+                        block.canPlace(gridX,gridY)
                     )
                    )
                 {

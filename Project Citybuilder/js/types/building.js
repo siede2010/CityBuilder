@@ -65,6 +65,13 @@ class BuildingType
             this.stats.push([stats[i],0])
         allBuildings.push(this)
     }
+    canPlace(x,y)
+    {
+        if (this.floor)
+            return gameSystem.tileGridUnder[x][y] == null
+        return gameSystem.tileGrid[x][y] == null
+    }
+
     getStat(stat)
     {
         return this.stats.filter(p => p[0] == stat)[0]
@@ -220,6 +227,18 @@ class MultiBlockType extends BuildingType
         super(name)
         this.width = 1
         this.height = 1
+    }
+    canPlace = function(x,y)
+    {
+        let cx = gameSystem.buildrotation % 2 == 0 ? this.width : this.height
+        let cy = gameSystem.buildrotation % 2 == 0 ? this.height : this.width
+        let grid = this.floor ? gameSystem.tileGridUnder : gameSystem.tileGrid
+        console.log(x + "|" + y)
+        for(let ix = 0;ix < cx;ix++)
+            for(let iy = 0;iy < cy;iy++)
+                if (grid[x-ix][y-iy] != null || x-ix < 0 || y-iy < 0)
+                    return false
+        return true
     }
     spriteOffset = function()
     {
