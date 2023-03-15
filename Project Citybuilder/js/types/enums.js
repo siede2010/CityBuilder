@@ -1,6 +1,6 @@
 let stats = {
     happiness:"Happiness",
-    polution:"Polution",
+    population:"Population",
     nature:"Nature",
     safety:"Safety",
     work:"Work",
@@ -11,6 +11,20 @@ let stats = {
     education:"Education",
     cost:"Cost",
     trust:"Trust"
+}
+let statStartValue = {
+    Happiness:0,
+    Population:0,
+    Nature:40,
+    Safety:0,
+    Work:0,
+    Food:50,
+    Economics:0,
+    Energy:0,
+    HealthCare:0,
+    Education:0,
+    Cost:100,
+    Trust:0
 }
 let colors = {
     blue : "",

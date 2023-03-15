@@ -41,6 +41,24 @@ function main()
     info.addEventListener("click",() => {infoScreen()})
     credits.addEventListener("click",() => {creditScreen()})
 }
+function score(s)
+{
+    let scroe = document.createElement("b")
+    let p = getElementById(getElementById(gameUI,"row1"),"bars")
+    p.append(scroe)
+    scroe.append(document.createTextNode("Final Score :"))
+    scroe.append(document.createTextNode(s))
+    let ret = document.createElement("div")
+    p.append(document.createElement("br"))
+    p.append(ret)
+    ret.className = "btn btn-success"
+    ret.innerText = "Return"
+    ret.style = "font-weight:bold"
+    ret.addEventListener("click",() => {
+        p.innerText = ""
+        goMain()
+    })
+}
 function goMain()
 {
     document.body.innerText = ""

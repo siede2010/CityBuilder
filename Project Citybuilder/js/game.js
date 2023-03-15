@@ -5,7 +5,7 @@ function game() {
     bars = getElementById(getElementById(gameUI,"row1"),"bars")
     gameStats = []
     for (let i in stats)
-        gameStats.push([stats[i],new GlobalVar(50).setName(stats[i])])
+        gameStats.push([stats[i],new GlobalVar(statStartValue[stats[i]]).setName(stats[i])])
 }
 let gameSystem
 
@@ -32,13 +32,23 @@ function addBar(ui,trackValue)
     barIn.color = function(colorstring)
     {
         this.style = "background-color: #" + colorstring + ";"
+        this.color = colorstring
         console.log(this.style)
     }
     return barIn
 }
 function updateBar()
 {
-    barUpdates[barIndex][2].style.width = barUpdates[barIndex++][1].getVar() + "%"
+    if (barUpdates[barIndex][1].getVar() < 0)
+    {
+        barUpdates[barIndex][2].style = "background-color: #ff0000 !important; margin-left:auto ;margin-right:0"
+        barUpdates[barIndex][2].style.width = barUpdates[barIndex++][1].getVar() * -1 + "%"
+    }
+    else
+    {
+        barUpdates[barIndex][2].style = "background-color: #" + barUpdates[barIndex][2].color + ";"
+        barUpdates[barIndex][2].style.width = barUpdates[barIndex++][1].getVar() + "%"
+    }
     barIndex%=barUpdates.length
 }
 
@@ -55,6 +65,7 @@ class GameSystem
         this.buildrotation = 0
         this.particles = []
         this.clickPos = [0,0]
+        this.timer = 240
         this.gridSelected = {
             x:-1,
             y:-1
@@ -209,6 +220,14 @@ class GameSystem
         gameSystem.toolUpdate()
     }
 
+    timerUp()
+    {
+        this.canvas.remove()
+        clearInterval(this.toolAnimate)
+        barUpdates.forEach(u => clearInterval(u))
+        score(0)
+    }
+
     toolUpdate()
     {
         //Static Variables
@@ -331,7 +350,16 @@ class GameSystem
 
     animate()
     {
-        gameSystem.updateGrid()
+        gameSystem.timer -= 1
+        if (gameSystem.timer <= 0) {
+            gameSystem.timerUp()
+            clearInterval(gameSystem.animateInterval)
+        }
+        else
+        {
+            gameSystem.tileGrid.forEach(row=> row.forEach(cell => {if (cell != null) cell.update()}))
+            gameSystem.updateGrid()
+        }
     }
 
     getMousePosition(canvas,click)
@@ -377,7 +405,9 @@ class GameSystem
                 else
                     this.drawImage(drawer,this.tileGrid[ix][iy].getSprite(),x+this.tileGrid[ix][iy].spriteOffset()[0],y-this.tileGrid[ix][iy].source.heightDiff+this.tileGrid[ix][iy].spriteOffset()[1])
             }
-
+        drawer.fillStyle = "#000000"
+        drawer.fillText("Time Left : " + Math.floor(this.timer/60) + ":" + this.timer%60, this.canvas.width-125, 20)
+        drawer.fillText("Money : " + gameStats.filter(g=>g[0] == "Cost")[0][1].getVar(), 10, 20)
         if (this.MousePos.filter(i => i==0).length == 0)
             this.drawSelect()
     }

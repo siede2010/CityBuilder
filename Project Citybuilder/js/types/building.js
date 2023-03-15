@@ -50,6 +50,11 @@ class Building
         return "./img/buildings/" + this.name + "/" + this.name + ".png"
     }
 
+    update()
+    {
+        gameStats.filter(p => p[0] == this.stats.filter(s => s[0] == "food")[0][0])[0][1].var += this.stats.filter(s => s[0] == stats.food)[0][1]
+    }
+
 }
 class BuildingType
 {
@@ -114,6 +119,11 @@ class BuildingType
     }
     build(rotation,pos)
     {
+        this.stats.forEach(a =>
+            {
+                gameStats.filter(p => p[0] == a[0])[0][1].var += a[1]
+            }
+            )
         let build = new Building(this)
         if (this.turnable)
             build.rotation = rotation
