@@ -140,7 +140,6 @@ class Road extends Building
             x: position%gameSystem.tileGrid.length,
             y: Math.floor(position/gameSystem.tileGrid.length)
         } 
-        console.log(this.position)
     }
 
     getSprite = function()
@@ -217,7 +216,6 @@ class MultiBuilding extends Building
         for(let ix = 0;ix < this.dim.w;ix++)
             for(let iy = 0;iy < this.dim.h;iy++)
             {
-                console.log(ix+"|"+iy)
                 if (gameSystem.tileGrid[this.position.x - ix][this.position.y - iy] == this) continue
                 gameSystem.tileGrid[this.position.x - ix][this.position.y - iy] = new Reference(this)
             }
@@ -248,7 +246,6 @@ class MultiBlockType extends BuildingType
         let cx = gameSystem.buildrotation % 2 == 0 ? this.width : this.height
         let cy = gameSystem.buildrotation % 2 == 0 ? this.height : this.width
         let grid = this.floor ? gameSystem.tileGridUnder : gameSystem.tileGrid
-        console.log(x + "|" + y)
         for(let ix = 0;ix < cx;ix++)
             for(let iy = 0;iy < cy;iy++)
                 if (grid[x-ix][y-iy] != null || x-ix < 0 || y-iy < 0)

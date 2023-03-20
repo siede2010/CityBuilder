@@ -33,7 +33,6 @@ function addBar(ui,trackValue)
     {
         this.style = "background-color: #" + colorstring + ";"
         this.color = colorstring
-        console.log(this.style)
     }
     return barIn
 }
@@ -182,7 +181,6 @@ class GameSystem
         })
 
         document.addEventListener("keypress",(e) => {
-            console.log(e.key)
             if (e.key == "e") {
                 this.buildrotation += 1
                 this.buildrotation %= 4
@@ -387,7 +385,6 @@ class GameSystem
             {
                 let x = i1 * tilesize.x - i2 * (tilesize.x / 2) - sideOffset - (tilesize.x / 2) - tilesize.x
                 let y = i2 * (tilesize.y / 2) - (tilesize.y / 2) - 2 - tilesize.y
-                console.log(size-i1)
                 switch (size-i1-2)
                 {
                     case 0:
@@ -477,10 +474,13 @@ function initiateTutorial()
     m.remove()
     document.body.append(gameUI)
     gameSystem = new GameSystem(4,30,gameUI,gameStats)
+    gameSystem.timer = 30
     loadBars()
 }
 function loadBars()
 {
+    for (let i in stats)
+        gameStats.find(p=> p[0] == stats[i])[1] = new GlobalVar(statStartValue[stats[i]]).setName(stats[i])
     addBar(bars,gameStats[0][1]).className += colors.lime
     addBar(bars,gameStats[1][1]).className += colors.turkis
     addBar(bars,gameStats[2][1]).className += colors.lime
