@@ -52,7 +52,7 @@ class Building
 
     update()
     {
-        gameStats.filter(p => p[0] == this.stats.filter(s => s[0] == "food")[0][0])[0][1].var += this.stats.filter(s => s[0] == stats.food)[0][1]
+        gameStats.filter(p => p[0] == "Food")[0][1].var += this.source.stats.filter(s => s[0] == stats.food)[0][1]
     }
 
 }
@@ -191,6 +191,11 @@ class RoadType extends BuildingType
     }
     build = function(r,position)
     {
+        this.stats.forEach(a =>
+            {
+                gameStats.filter(p => p[0] == a[0])[0][1].var += a[1]
+            }
+            )
         return new Road(this,position)
     }
 }
@@ -260,6 +265,11 @@ class MultiBlockType extends BuildingType
     }
     build = function(rotation,position)
     {
+        this.stats.forEach(a =>
+            {
+                gameStats.filter(p => p[0] == a[0])[0][1].var += a[1]
+            }
+            )
         return new MultiBuilding(this,position,rotation)
     }
 }
@@ -274,6 +284,7 @@ class Reference
     {
         return this.ref
     }
+    update() {return}
     getSprite() {return ""}
     spriteOffset() {return [0,0]}
 }

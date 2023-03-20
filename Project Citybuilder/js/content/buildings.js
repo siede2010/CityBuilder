@@ -30,7 +30,10 @@ function buildings()
         self.heightDiff = 14
     })
     house = new MultiBlockType("house").getThis((self) => {
-        self.setStat
+        self.setStat(stats.cost,-2)
+        self.setStat(stats.food,-2)
+        self.setStat(stats.population,3)
+        self.setStat(stats.energy,-1)
         self.turnable = true
         self.type = type.population
         self.heightDiff = 16
@@ -38,6 +41,7 @@ function buildings()
         self.width = 1
     })
     road = new RoadType("road").getThis((self) => {
+        self.setStat(stats.cost,-1)
         self.type = type.security
     })
 }

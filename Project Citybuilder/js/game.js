@@ -358,6 +358,8 @@ class GameSystem
         else
         {
             gameSystem.tileGrid.forEach(row=> row.forEach(cell => {if (cell != null) cell.update()}))
+            if (gameSystem.timer % 30 == 0)
+                gameStats.filter(g=>g[0] == "Cost")[0][1].var += 10
             gameSystem.updateGrid()
         }
     }
@@ -379,6 +381,29 @@ class GameSystem
         let towerFloor = false
         if (this.drawPlace)
             towerFloor = this.towers[this.typeOrder[this.selectedIndex]][this.selectedTower[this.typeOrder[this.selectedIndex]]].floor
+        //Draw Sea
+        for(let i1 = 0;i1<size-1;i1++)
+            for(let i2 = 0;i2<2*i1-1;i2++)
+            {
+                let x = i1 * tilesize.x - i2 * (tilesize.x / 2) - sideOffset - (tilesize.x / 2) - tilesize.x
+                let y = i2 * (tilesize.y / 2) - (tilesize.y / 2) - 2 - tilesize.y
+                console.log(size-i1)
+                switch (size-i1-2)
+                {
+                    case 0:
+                        this.drawImage(drawer,"./img/environment/sea-land.png",x,y)
+                        break;
+                    case 1:
+                        this.drawImage(drawer,"./img/environment/sea-deep1.png",x,y)
+                        break;
+                    case 2:
+                        this.drawImage(drawer,"./img/environment/sea-deep2.png",x,y)
+                        break;
+                    default:
+                        this.drawImage(drawer,"./img/environment/sea-deep-max.png",x,y)
+                        break;
+                }
+            }
         //Bottom
         for(let ix = 0;ix<size;ix++)
             for(let iy = 0;iy<size;iy++)
