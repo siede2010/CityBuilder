@@ -52,6 +52,7 @@ addDirectory("types")
 require("main")
 //types
 require("building")
+require("disaster")
 //content
 require("buildings")
 //extra

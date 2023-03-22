@@ -1,4 +1,4 @@
-let apartment,forest,road,smallHospital,house
+let apartment,forest,road,smallHospital,house,solarPannel
 function buildings()
 {
     
@@ -43,5 +43,11 @@ function buildings()
     road = new RoadType("road").getThis((self) => {
         self.setStat(stats.cost,-1)
         self.type = type.security
+    })
+    solarPannel = new BuildingType("solar-pannel").getThis((self) => {
+        self.setStat(stats.cost,-2)
+        self.setStat(stats.energy,2)
+        self.type = type.work
+        self.turnable = false
     })
 }

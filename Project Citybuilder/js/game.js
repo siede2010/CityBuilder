@@ -28,7 +28,7 @@ function addBar(ui,trackValue)
     barOut.addEventListener("mouseleave",(e) => {
         b.innerText = ""
     })
-    barUpdates.push([setInterval(updateBar,100),trackValue,barIn])
+    barUpdates.push([setInterval(updateBar,100),trackValue,barIn,0])
     barIn.color = function(colorstring)
     {
         this.style = "background-color: #" + colorstring + ";"
@@ -38,10 +38,18 @@ function addBar(ui,trackValue)
 }
 function updateBar()
 {
+    barUpdates[barIndex][3] = (1+barUpdates[barIndex][3]) % 2
     if (barUpdates[barIndex][1].getVar() < 0)
     {
-        barUpdates[barIndex][2].style = "background-color: #ff0000 !important; margin-left:auto ;margin-right:0"
-        barUpdates[barIndex][2].style.width = barUpdates[barIndex++][1].getVar() * -1 + "%"
+        if (barUpdates[barIndex][1].getVar() < dangerLimit[barUpdates[barIndex][1].name] )
+        {
+            barUpdates[barIndex][2].style = "background-color: #" + (barUpdates[barIndex][3] == 0 ? "ff0000" : "ff4444") +" !important; margin-left:auto ;margin-right:0"
+            barUpdates[barIndex][2].style.width = barUpdates[barIndex++][1].getVar() * -1 + "%"
+        }
+        else {
+            barUpdates[barIndex][2].style = "background-color: #ff0000 !important; margin-left:auto ;margin-right:0"
+            barUpdates[barIndex][2].style.width = barUpdates[barIndex++][1].getVar() * -1 + "%"
+        }
     }
     else
     {
@@ -218,12 +226,11 @@ class GameSystem
         gameSystem.toolUpdate()
     }
 
-    timerUp()
+    timerUp(string)
     {
         this.canvas.remove()
-        clearInterval(this.toolAnimate)
         barUpdates.forEach(u => clearInterval(u))
-        score(0)
+        score(0,string)
     }
 
     toolUpdate()
@@ -350,16 +357,39 @@ class GameSystem
     {
         gameSystem.timer -= 1
         if (gameSystem.timer <= 0) {
-            gameSystem.timerUp()
-            clearInterval(gameSystem.animateInterval)
+            gameSystem.timerUp("You Won")
+            gameSystem.destroy()
+        }
+        else if(!gameSystem.isGameOver())
+        {
+            gameSystem.tileGrid.forEach(row=> row.forEach(cell => {if (cell != null) cell.update()}))
+            if (gameSystem.timer % 30 == 0) {
+                gameStats.filter(g=>g[0] == "Cost")[0][1].var += gameStats.filter(g=>g[0] == "Work")[0][1].var
+                if (gameStats.filter(g=>g[0] == "Cost")[0][1].var < 0) {
+                    gameSystem.timerUp("Defeat : " + defeatStatement["Cost"])
+                    gameSystem.destroy()
+                    return
+                }
+            }
+            gameSystem.updateGrid()
+            
         }
         else
         {
-            gameSystem.tileGrid.forEach(row=> row.forEach(cell => {if (cell != null) cell.update()}))
-            if (gameSystem.timer % 30 == 0)
-                gameStats.filter(g=>g[0] == "Cost")[0][1].var += 10
-            gameSystem.updateGrid()
+            gameSystem.timerUp("Defeat : " + defeatStatement[gameStats.filter(p => p[1].var <= gameOverStats[p[0]])[0][0]])
+            gameSystem.destroy()
         }
+    }
+
+    isGameOver()
+    {
+        return gameStats.filter(p => p[1].var <= gameOverStats[p[0]]).length != 0
+    }
+
+    destroy()
+    {
+        clearInterval(this.animateInterval)
+        clearInterval(this.toolAnimateInterval)
     }
 
     getMousePosition(canvas,click)

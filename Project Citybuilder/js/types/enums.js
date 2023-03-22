@@ -42,3 +42,45 @@ let type = {
     happiness : "happiness",
     none : "none"
 }
+let defeatStatement = {
+    Happiness:"Happiness got too low",
+    Population:"Underpopulated",
+    Nature:"People didnt see any Nature",
+    Safety:"the town was a wasteland due to the lack of Safety",
+    Work:"too many people were homeless due to a lack of Work",
+    Food:"Hunger has grown into a large issue of your city.",
+    Economics:"Economics could not have crashed harder than this.",
+    Energy:"A lack of Energy left many people to desert the town.",
+    HealthCare:"even 'free' HealthCare was too expensive for you. wasnt it.",
+    Education:"too little Education left many people not understanding basic maths.",
+    Cost:"You were in too deep of a debt and lost the city in a bid to pay off the debt.",
+    Trust:"the people of the city had no Trust in you and left it due to fear."
+}
+let gameOverStats = {
+    Happiness:-100,
+    Population:-50,
+    Nature:-100,
+    Safety:-100,
+    Work:-150,
+    Food:-200,
+    Economics:-50,
+    Energy:-250,
+    HealthCare:-100,
+    Education:-100,
+    Cost:-999999,
+    Trust:-100
+}
+let dangerLimit = {
+    Happiness:-50,
+    Population:0,
+    Nature:-50,
+    Safety:-50,
+    Work:-100,
+    Food:-100,
+    Economics:0,
+    Energy:-100,
+    HealthCare:-50,
+    Education:-50,
+    Cost:0,
+    Trust:-50
+}
