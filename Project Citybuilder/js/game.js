@@ -294,7 +294,7 @@ class GameSystem
 
         drawer.addDraw((drawer,args) => {
             if (this.selectedIndex > -1)
-            drawImageWithScale(drawer,"./img/ui/selected.png",toolOffset+this.selectableTool[this.selectedIndex][0],this.floor+this.selectableTool[this.selectedIndex][1],320,64)
+                drawImageWithScale(drawer,"./img/ui/selected.png",toolOffset+this.selectableTool[this.selectedIndex][0],this.floor+this.selectableTool[this.selectedIndex][1],320,64)
         },null);
 
         drawer.addDraw((drawer,args) => {
