@@ -1,0 +1,39 @@
+.progress {
+    background-color: rgb(58, 58, 58);
+    height: 16px;
+    width: 95%;
+    overflow-x:hidden;
+    border:none;
+    border-radius: 4px;
+}
+.progress-bar {
+    background-color: blue;
+    color:white;
+    overflow-x:hidden;
+    text-align: center;
+    height: 16px;
+    width: 50%;
+}
+.btn {
+    background-color: white;
+    border: none;
+    border-radius: 4px;
+}
+.btn-success {
+    background-color: lime;
+}
+.btn-warning {
+    background-color: orange;
+}
+.btn-danger {
+    background-color: red;
+}
+.btn-secondary {
+    background-color: turquoise;
+}
+.btn-info {
+    background-color: greenyellow;
+}
+.btn-dark {
+    background-color: darkgray;
+}

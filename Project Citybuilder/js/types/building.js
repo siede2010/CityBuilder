@@ -84,7 +84,7 @@ class BuildingType
 
     spriteOffset()
     {
-        return [8,0]
+        return [4,0]
     }
 
     setStat(stat,value)
@@ -127,6 +127,9 @@ class BuildingType
         let build = new Building(this)
         if (this.turnable)
             build.rotation = rotation
+        drawer.addDraw((t) => {
+            
+        })
         return build
     }
 }
@@ -146,7 +149,7 @@ class Road extends Building
     {
         let i = 0
         let c = null
-        let top = gameSystem.tileGrid[this.position.x][this.position.y]
+        let top = gameSystem.tileGrid.get(this.position.x,this.position.y)
         let blocked = [false,false]
         if (top != null) {
             if (top instanceof Reference) {
@@ -157,12 +160,12 @@ class Road extends Building
             }
         }
         if (this.position.x != 0)
-            c = gameSystem.tileGridUnder[this.position.x-1][this.position.y]
+            c = gameSystem.tileGridUnder.get(this.position.x-1,this.position.y)
         if (!blocked[0] && this.position.x > 0 && c != null && c.source == this.source)
             i+=1
         c = null
         if (this.position.y != 0)
-            c = gameSystem.tileGridUnder[this.position.x][this.position.y-1]
+            c = gameSystem.tileGridUnder.get(this.position.x,this.position.y-1)
         if (!blocked[1] && this.position.y > 0 && c != null && c.source == this.source)
             i+=2
         return "./img/road/" + this.name + "-" + i + ".png"
@@ -284,4 +287,11 @@ class Reference
     update() {return}
     getSprite() {return ""}
     spriteOffset() {return [0,0]}
+}
+class noBuild
+{
+    constructor()
+    {}
+    getSprite() {return "./img/buildings/empty.png"}
+    update() {}
 }

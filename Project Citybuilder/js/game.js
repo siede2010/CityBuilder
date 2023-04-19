@@ -38,7 +38,7 @@ function addBar(ui,trackValue)
 }
 function updateBar()
 {
-    barUpdates[barIndex][3] = (1+barUpdates[barIndex][3]) % 2
+
     if (barUpdates[barIndex][1].getVar() < 0)
     {
         if (barUpdates[barIndex][1].getVar() < dangerLimit[barUpdates[barIndex][1].name] )
@@ -57,6 +57,42 @@ function updateBar()
         barUpdates[barIndex][2].style.width = barUpdates[barIndex++][1].getVar() + "%"
     }
     barIndex%=barUpdates.length
+}
+
+class Grid2D
+{
+    constructor(size,cons)
+    {
+        this.list = []
+        this.width = size;
+        if (cons == null) {
+            for(let i = size*size;i > 0;i--)
+                this.list.push(null)
+        } else {
+            for(let i = size*size;i > 0;i--)
+            this.list.push(new cons())
+        }
+    }
+
+    get(x,y)
+    {
+        return this.list[x+y*this.width];
+    }
+
+    set(x,y,value)
+    {
+        this.list[x+y*this.width] = value;
+    }
+
+    index(i)
+    {
+        return this.list[i];
+    }
+
+    forEach(cons)
+    {
+        this.list.forEach(cons);
+    }
 }
 
 class GameSystem
@@ -81,11 +117,11 @@ class GameSystem
         gameSystem = this
         this.selectedArrow = 0
         this.selectableTool = [
-            [14,16],
-            [60,16],
-            [108,16],
-            [156,16],
-            [202,16],
+            [14,16,"security"],
+            [60,16,"nature"],
+            [108,16,"population"],
+            [156,16,"work"],
+            [202,16,"happiness"],
         ]
         this.typeOrder = [
             type.security,
@@ -113,24 +149,13 @@ class GameSystem
         this.offset = [24,96]
 
         //Normal Ground Tile Set
-        this.tileGrid = []
-        for(let iy = 0;iy<size;iy++)
-        {
-            this.tileGrid.push([])
-            for(let ix = 0;ix<size;ix++)
-                this.tileGrid[this.tileGrid.length-1].push(null)
-        }
-        this.gameSize = { x:this.tileGrid.length*tilesize.x, 
-                          y:this.tileGrid[0].length*tilesize.y}
+        this.tileGrid = new Grid2D(size,noBuild)
+
+        this.gameSize = { x:size*tilesize.x, 
+                          y:size*tilesize.y}
 
         //Floor Ground Tile Set
-        this.tileGridUnder = []
-        for(let iy = 0;iy<size;iy++)
-        {
-            this.tileGridUnder.push([])
-            for(let ix = 0;ix<size;ix++)
-                this.tileGridUnder[this.tileGridUnder.length-1].push(null)
-        }
+        this.tileGridUnder = new Grid2D(size,noBuild)
 
         //PlayField
         this.canvas = document.createElement("canvas")
@@ -185,7 +210,7 @@ class GameSystem
                     this.selectedTower[this.typeOrder[this.selectedIndex]] = --this.selectedTower[this.typeOrder[this.selectedIndex]] < 0 ? this.towers[this.typeOrder[this.selectedIndex]].length-1 : this.selectedTower[this.typeOrder[this.selectedIndex]]
                 }
             }
-        this.placeDraw(this.selectedIndex != -1)
+        this.drawPlace = this.selectedIndex != -1;
         })
 
         document.addEventListener("keypress",(e) => {
@@ -198,28 +223,90 @@ class GameSystem
                 if (this.buildrotation < 0)
                     this.buildrotation = 3
             }
-            this.updateGrid()
         })
 
         this.MousePos = [0,0]
         this.canvas.addEventListener("mousemove",(e) => {
             this.MousePos = this.getMousePosition(this.canvas,e)
-            this.updateGrid()
         })
 
         this.canvas.addEventListener("mouseleave",(e) => {
             this.MousePos = [0,0]
             this.gridSelected.x = -1
             this.gridSelected.y = -1
-            this.updateGrid()
         })
 
         this.floor = this.canvas.height-64
 
+        //drawSystem
+        drawer.setCanvas(this.canvas)
+        drawer.addDraw((drawer,args) => {
+            drawFill(drawer,0,0,canvasX,canvasY,"#4db938")
+        },null)
+        //Bottom
+        let offsetFSide = (this.canvas.width-this.gameSize.x)/2
+        for(let ix = 0;ix<size;ix++)
+            for(let iy = 0;iy<size;iy++)
+                {
+                    let ind = ix+iy*size;
+                    let x = (ix-iy-1) * tilesize.x/2 +
+                    this.canvas.width/2
+
+                    let y = 25 + (iy+ix) * tilesize.y/2
+
+                    drawer.addDraw((drawer,args) => {
+                        let index = args[0];
+                        let fx = args[1];
+                        let fy = args[2];
+                        drawImage(drawer,this.tileGridUnder.index(index).getSprite(),fx,fy)
+                    },ind,x,y)
+                }
+        for(let ix = 0;ix<size;ix++)
+            for(let iy = 0;iy<size;iy++)
+                {
+                    let ind = ix+iy*size;
+                    let x = (ix-iy-1) * tilesize.x/2 +
+                    this.canvas.width/2
+
+                    let y = 25 + (iy+ix) * tilesize.y/2
+
+                    drawer.addDraw((drawer,args) => {
+                        let index = args[0];
+                        let fx = args[1];
+                        let fy = args[2];
+                        drawImage(drawer,this.tileGrid.index(index).getSprite(),fx,fy)
+                    },ind,x,y)
+                }
+
+        let toolOffset = (this.canvas.width - 320)/2
+        drawer.addDraw((drawer,args) => {
+            drawImageWithScale(drawer,"./img/ui/Toolbar.png",toolOffset,this.floor,320,64)
+        },null);
+        for(let s in this.selectableTool)
+        {
+            let x = this.selectableTool[s][0];
+            let y = this.selectableTool[s][1];
+            drawer.addDraw((drawer,args) => {
+                let tower = this.towers[args[0]][this.selectedTower[args[0]]]
+                drawImage(drawer,tower.getIcon(),args[1]+tower.spriteOffset()[0],args[2]+tower.spriteOffset()[1],64,64)
+            },this.selectableTool[s][2],x+toolOffset,this.floor+y)
+        }
+
+        drawer.addDraw((drawer,args) => {
+            if (this.selectedIndex > -1)
+            drawImageWithScale(drawer,"./img/ui/selected.png",toolOffset+this.selectableTool[this.selectedIndex][0],this.floor+this.selectableTool[this.selectedIndex][1],320,64)
+        },null);
+
+        drawer.addDraw((drawer,args) => {
+            drawImageWithScale(drawer,"./img/ui/Toolbar-lowBar.png",toolOffset,this.floor,320,64)
+        },null);
+
+
         //animation
-        this.updateGrid()
-        this.toolAnimateInterval = setInterval(this.toolAnimate,64)
-        this.animateInterval = setInterval(this.animate,1000)
+        this.animateInterval = setInterval(() => {
+            this.update();
+            drawer.update();
+        },32)
     }
     toolAnimate()
     {
@@ -233,6 +320,12 @@ class GameSystem
         score(0,string)
     }
 
+    update()
+    {
+
+    }
+
+    /*
     toolUpdate()
     {
         //Static Variables
@@ -242,12 +335,12 @@ class GameSystem
         let i = 0
         let found = false
         //DrawToolbar
-        this.drawImageWithScale(toolDraw,"./img/ui/Toolbar.png",toolOffset,this.floor,320,64)
+        drawImageWithScale(toolDraw,"./img/ui/Toolbar.png",toolOffset,this.floor,320,64)
 
         //drawBuilding
         this.typeOrder.forEach(type => {
             if (this.towers[type].length > 0) {
-                this.drawImage(
+                drawImage(
                     toolDraw,
                     this.towers[type][this.selectedTower[type]].getIcon(),
                     this.selectableTool[i][0] + toolOffset + 4,
@@ -259,13 +352,13 @@ class GameSystem
 
         //Selected Draw
         if (this.selectedIndex != -1)
-            this.drawImageWithScale(toolDraw,"./img/ui/selected.png",this.selectableTool[this.selectedIndex][0]+toolOffset,this.selectableTool[this.selectedIndex][1]+this.floor,40,40)
+            drawImageWithScale(toolDraw,"./img/ui/selected.png",this.selectableTool[this.selectedIndex][0]+toolOffset,this.selectableTool[this.selectedIndex][1]+this.floor,40,40)
         for (let i in this.selectableTool)
         {
             let pos = this.selectableTool[i]
             
             if (withinBounds(pos[0]+toolOffset,pos[1]+this.floor,40,40,this.MousePos[0],this.MousePos[1])) {
-                this.drawImageWithScale(toolDraw,"./img/ui/hover.png",this.selectableTool[i][0]+toolOffset,this.selectableTool[i][1]+this.floor,40,40)
+                drawImageWithScale(toolDraw,"./img/ui/hover.png",this.selectableTool[i][0]+toolOffset,this.selectableTool[i][1]+this.floor,40,40)
                 this.hoverIndex = i
                 found = true
             }
@@ -286,13 +379,13 @@ class GameSystem
                 this.selectedArrow = 1
             else
                 this.selectedArrow = 2
-            this.drawImageWithScale(toolDraw,arrowIcon,toolOffset,this.floor,320,64)
+            drawImageWithScale(toolDraw,arrowIcon,toolOffset,this.floor,320,64)
         }
         else
             this.selectedArrow = 0
 
         //Cut off buildings
-        this.drawImageWithScale(toolDraw,"./img/ui/Toolbar-lowBar.png",toolOffset,this.floor,320,64)
+        drawImageWithScale(toolDraw,"./img/ui/Toolbar-lowBar.png",toolOffset,this.floor,320,64)
     }
 
     drawSelect()
@@ -332,7 +425,7 @@ class GameSystem
                    )
                 {
                     selDraw.globalAlpha = 0.6
-                    this.drawImage(selDraw,block.getSprite(this.buildrotation),(this.canvas.width-this.gameSize.x)/2 + this.tileGrid.length * tilesize.x/2+gridX*tilesize.x/2 - gridY *tilesize.x/2 - tilesize.x/2+block.spriteOffset()[0],this.margin+gridY * tilesize.y/2 + gridX * tilesize.y/2+tilesize.y-6-block.heightDiff-block.spriteOffset()[1])
+                    drawImage(selDraw,block.getSprite(this.buildrotation),(this.canvas.width-this.gameSize.x)/2 + this.tileGrid.length * tilesize.x/2+gridX*tilesize.x/2 - gridY *tilesize.x/2 - tilesize.x/2+block.spriteOffset()[0],this.margin+gridY * tilesize.y/2 + gridX * tilesize.y/2+tilesize.y-6-block.heightDiff-block.spriteOffset()[1])
                     // ---------------------------------Debug tool----------------------------------------- //
                     // selDraw.strokeText("["+ gridX + "|" + gridY+"]", this.MousePos[0], this.MousePos[1]) //
                     // ------------------------------------------------------------------------------------ //
@@ -352,34 +445,7 @@ class GameSystem
                 this.gridSelected.y = -1
             }
     }
-
-    animate()
-    {
-        gameSystem.timer -= 1
-        if (gameSystem.timer <= 0) {
-            gameSystem.timerUp("You Won")
-            gameSystem.destroy()
-        }
-        else if(!gameSystem.isGameOver())
-        {
-            gameSystem.tileGrid.forEach(row=> row.forEach(cell => {if (cell != null) cell.update()}))
-            if (gameSystem.timer % 30 == 0) {
-                gameStats.filter(g=>g[0] == "Cost")[0][1].var += gameStats.filter(g=>g[0] == "Work")[0][1].var
-                if (gameStats.filter(g=>g[0] == "Cost")[0][1].var < 0) {
-                    gameSystem.timerUp("Defeat : " + defeatStatement["Cost"])
-                    gameSystem.destroy()
-                    return
-                }
-            }
-            gameSystem.updateGrid()
-            
-        }
-        else
-        {
-            gameSystem.timerUp("Defeat : " + defeatStatement[gameStats.filter(p => p[1].var <= gameOverStats[p[0]])[0][0]])
-            gameSystem.destroy()
-        }
-    }
+    */
 
     isGameOver()
     {
@@ -397,11 +463,10 @@ class GameSystem
         let rect = canvas.getBoundingClientRect()
         return [click.clientX - rect.left,click.clientY - rect.top]
     }
-
-    updateGrid()
-    {
+        /*
         let drawer = this.canvas.getContext("2d")
         let size = this.tileGrid.length
+        drawer.font = "18px serif";
         drawer.fillStyle = "#4db938"
         drawer.fillRect(0,0,this.canvas.width,this.canvas.height)
         this.toolUpdate()
@@ -418,16 +483,16 @@ class GameSystem
                 switch (size-i1-2)
                 {
                     case 0:
-                        this.drawImage(drawer,"./img/environment/sea-land.png",x,y)
+                        drawImage(drawer,"./img/environment/sea-land.png",x,y)
                         break;
                     case 1:
-                        this.drawImage(drawer,"./img/environment/sea-deep1.png",x,y)
+                        drawImage(drawer,"./img/environment/sea-deep1.png",x,y)
                         break;
                     case 2:
-                        this.drawImage(drawer,"./img/environment/sea-deep2.png",x,y)
+                        drawImage(drawer,"./img/environment/sea-deep2.png",x,y)
                         break;
                     default:
-                        this.drawImage(drawer,"./img/environment/sea-deep-max.png",x,y)
+                        drawImage(drawer,"./img/environment/sea-deep-max.png",x,y)
                         break;
                 }
             }
@@ -439,10 +504,10 @@ class GameSystem
                     let y = ((tilesize.y/2)*ix+(tilesize.y/2)*iy-tilesize.x+this.offset[1])
                     if (this.tileGridUnder[ix][iy] == null) {
                         if (this.drawPlace && towerFloor) 
-                            this.drawImage(drawer,"./img/buildings/empty.png",x,y)
+                            drawImage(drawer,"./img/buildings/empty.png",x,y)
                     }
                     else
-                        this.drawImage(drawer,this.tileGridUnder[ix][iy].getSprite(),x+this.tileGridUnder[ix][iy].spriteOffset()[0],y-this.tileGridUnder[ix][iy].source.heightDiff+this.tileGridUnder[ix][iy].spriteOffset()[1])
+                        drawImage(drawer,this.tileGridUnder[ix][iy].getSprite(),x+this.tileGridUnder[ix][iy].spriteOffset()[0],y-this.tileGridUnder[ix][iy].source.heightDiff+this.tileGridUnder[ix][iy].spriteOffset()[1])
                 }
         //Top
         for(let ix = 0;ix<size;ix++)
@@ -452,43 +517,55 @@ class GameSystem
                 let y = ((tilesize.y/2)*ix+(tilesize.y/2)*iy-tilesize.x+this.offset[1])
                 if (this.tileGrid[ix][iy] == null) {
                     if (this.drawPlace && !towerFloor) 
-                        this.drawImage(drawer,"./img/buildings/empty.png",x,y)
+                        drawImage(drawer,"./img/buildings/empty.png",x,y)
                 }
                 else
-                    this.drawImage(drawer,this.tileGrid[ix][iy].getSprite(),x+this.tileGrid[ix][iy].spriteOffset()[0],y-this.tileGrid[ix][iy].source.heightDiff+this.tileGrid[ix][iy].spriteOffset()[1])
+                    drawImage(drawer,this.tileGrid[ix][iy].getSprite(),x+this.tileGrid[ix][iy].spriteOffset()[0],y-this.tileGrid[ix][iy].source.heightDiff+this.tileGrid[ix][iy].spriteOffset()[1])
             }
         drawer.fillStyle = "#000000"
         drawer.fillText("Time Left : " + Math.floor(this.timer/60) + ":" + this.timer%60, this.canvas.width-125, 20)
         drawer.fillText("Money : " + gameStats.filter(g=>g[0] == "Cost")[0][1].getVar(), 10, 20)
         if (this.MousePos.filter(i => i==0).length == 0)
             this.drawSelect()
-    }
+            */
+
+        /*
+        this.tutorialCanvas = document.createElement("canvas")
+        this.tutorialCanvas.width = this.canvas.width
+        this.tutorialCanvas.height = this.canvas.height
+        this.canvas.parentElement.append(this.tutorialCanvas)
+        this.canvas.remove()
+        let tutDraw = this.tutorialCanvas.getContext("2d")
+        let tempTime = this.timer
+        let texts = text.split('\n')
+        this.timer = 9999999
+        tutDraw.font = "18px serif"
+        tutDraw.fillStyle = "#4db938"
+        tutDraw.fillRect(0,0,this.tutorialCanvas.width,this.tutorialCanvas.height)
+        tutDraw.fillStyle = "#000000"
+        for(let i = 0;i<texts.length;i++)
+            tutDraw.fillText(texts[i],this.tutorialCanvas.width/2-texts[i].length*4,this.tutorialCanvas.height/2 + i * 15 - texts.length * 7.5)
+        tutDraw.fillText("Press anywhere to continue",10,this.tutorialCanvas.height-10)   
+        this.tutorialCanvas.addEventListener("click",(e) => {
+            this.tutorialCanvas.parentElement.append(this.canvas)
+            this.tutorialCanvas.remove()
+            this.timer = tempTime
+        })
 
     placeDraw(bool)
     {
         this.drawPlace = bool
         this.updateGrid()
     }
-
-    drawImage(drawer,img,x,y)
-    {
-        let image = document.createElement("img")
-        image.src = img
-        drawer.drawImage(image,x,y)
-    }
-    drawImageWithScale(drawer,img,x,y,w,h)
-    {
-        let image = document.createElement("img")
-        image.src = img
-        drawer.drawImage(image,x,y,w,h)
-    }
+    */
 }
-function withinBounds(x,y,w,h,px,py)
+
+withinBounds = (x,y,w,h,x2,y2) =>
 {
-    return px > x && 
-        px < x+w &&
-        py > y && 
-        py < y+h
+    return x2 > x && 
+        x2 < x+w &&
+        y2 > y && 
+        y2 < y+h
         
 }
 
@@ -505,6 +582,8 @@ function initiateTutorial()
     document.body.append(gameUI)
     gameSystem = new GameSystem(4,30,gameUI,gameStats)
     gameSystem.timer = 30
+    gameSystem.tutorialText("Click on icon to select it.\nThe Arrows on the Right allows you\nto scroll through the selected category.\nthe arrows on the right will\nscroll through ALL CATEGORY'S\nif nothing was selected\nFood will NOT remain static\nlike the other things.\nGoodluck =)")
+    gameSystem.tileGrid[0][0] = forest.build(0)
     loadBars()
 }
 function loadBars()

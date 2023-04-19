@@ -49,12 +49,15 @@ let loadProgress = document.getElementById("loadProgress")
 // ------------------------------------------------ //
 addDirectory("content")
 addDirectory("types")
+addDirectory("draw")
 require("main")
 //types
 require("building")
 require("disaster")
 //content
 require("buildings")
+//draw
+require("draw");
 //extra
 require("game")
 
