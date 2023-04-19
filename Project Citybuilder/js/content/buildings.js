@@ -1,4 +1,4 @@
-let apartment,forest,road,smallHospital,house,solarPannel,fillin
+let apartment,forest,road,smallHospital,house,solarPannel
 function buildings()
 {
     
@@ -50,8 +50,14 @@ function buildings()
         self.type = type.work
         self.turnable = false
     })
-    fillin = new BuildingType("fillin").getThis((self) => {
-        self.setStat(stats.cost,-2)
-        self.type = type.happiness
+    powerplant = new BuildingType("powerplant").getThis((self) => {
+        self.setStats(stats.cost,-12)
+        self.setStats(stats.happiness,-5)
+        self.setStats(stats.nature,-12)
+        self.setStats(stats.energy,30)
+        self.setStats(stats.work,12)
+        self.setStats(stats.polution,18)
+        self.type = type.work
+        self.turnable = true
     })
 }
