@@ -59,6 +59,15 @@ function buildings()
         self.type = type.work
         self.turnable = true
     })
+    mall = new BuildingType("mall").getThis((self) => {
+        self.setStat(stats.food,10)
+        self.setStat(stats.nature,-6)
+        self.setStat(stats.work,10)
+        self.setStat(stats.energy,-5)
+        self.setStat(stats.cost,-8)
+        self.type = type.work
+        self.turnable = false
+    })
     fillin = new BuildingType("fillin").getThis((self) => {
         self.setStat(stats.cost,-2)
         self.type = type.happiness
