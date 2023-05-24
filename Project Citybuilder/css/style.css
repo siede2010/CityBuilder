@@ -40,3 +40,19 @@
 body {
     background-color: darkslategray;
 }
+
+.coin {
+    width: 32px;  /* Adjust width to match the frame size */
+    height: 32px; /* Adjust height to match the frame size */
+    background-image: url('../img/testSprite.png');
+    animation: animateFrames 1s steps(8) infinite;
+}
+
+@keyframes animateFrames {
+    from {
+      background-position: 0 0;  /* Initial frame position */
+    }
+    to {
+      background-position: 0 -256px;  /* Adjust -800px based on the total height of the sprite sheet */
+    }
+  }

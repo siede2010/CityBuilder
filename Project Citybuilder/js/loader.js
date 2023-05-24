@@ -41,21 +41,28 @@ function require(script)
 }
 function loaded() {
     for(let i in scripts)
+        try{
         this[scripts[i]]()
+        }
+        catch{}
 }
 let loadProgress = document.getElementById("loadProgress")
 // ------------------------------------------------ //
 //                Start of Content                  // 
 // ------------------------------------------------ //
-addDirectory("content")
-addDirectory("types")
-addDirectory("draw")
+addDirectory("content")// \
+addDirectory("types")  //  > the Directory's it will look for the scripts in.
+addDirectory("draw")   // /
+//Stuff gets loaded from top to bottom.
 require("main")
 //types
+require("effect")
 require("building")
 require("disaster")
 //content
+require("effects")
 require("buildings")
+require("disasters")
 //draw
 require("draw");
 //extra

@@ -52,7 +52,7 @@ class Building
 
     update()
     {
-        gameStats.filter(p => p[0] == "Food")[0][1].var += this.source.stats.filter(s => s[0] == stats.food)[0][1]
+        gameStats.filter(p => p[0] == "Food")[0][1].var += this.source.stats.filter(s => s[0] == stats.food)[0][1]/30
     }
 
 }
@@ -72,9 +72,8 @@ class BuildingType
     }
     canPlace(x,y)
     {
-        if (this.floor)
-            return gameSystem.tileGridUnder[x][y] == null
-        return gameSystem.tileGrid[x][y] == null
+        let grid = this.floor ? gameSystem.tileGridUnder : gameSystem.tileGrid
+        return grid.get(x,y) instanceof noBuild
     }
 
     getStat(stat)
@@ -140,25 +139,23 @@ class Road extends Building
     {
         super(source)
         this.position = {
-            x: position%gameSystem.tileGrid.length,
-            y: Math.floor(position/gameSystem.tileGrid.length)
+            x: position%gameSystem.tileGrid.width,
+            y: Math.floor(position/gameSystem.tileGrid.width)
         } 
     }
 
     getSprite = function()
     {
         let i = 0
-        let c = null
         let top = gameSystem.tileGrid.get(this.position.x,this.position.y)
         let blocked = [false,false]
-        if (top != null) {
-            if (top instanceof Reference) {
-                if (top.getRef().position.x > this.position.x)
-                    blocked[1] = true
-                if (top.getRef().position.y > this.position.y)
-                    blocked[0] = true
-            }
+        if (top instanceof Reference) {
+            if (top.getRef().position.x > this.position.x)
+                blocked[1] = true
+            if (top.getRef().position.y > this.position.y)
+                blocked[0] = true
         }
+        let c = null
         if (this.position.x != 0)
             c = gameSystem.tileGridUnder.get(this.position.x-1,this.position.y)
         if (!blocked[0] && this.position.x > 0 && c != null && c.source == this.source)
@@ -181,11 +178,11 @@ class RoadType extends BuildingType
     }
     getIcon = function()
     {
-        return "./img/road/" + this.name + "-1.png"
+        return "./img/road/" + this.name + "-icon.png"
     }
     spriteOffset = function()
     {
-        return [0,0]
+        return [-4,0]
     }
     getSprite = function(r)
     {
@@ -209,8 +206,8 @@ class MultiBuilding extends Building
         this.rotation = rotation
         let other = this.rotation%2 == 0
         this.position = {
-            x: position%gameSystem.tileGrid.length,
-            y: Math.floor(position/gameSystem.tileGrid.length)
+            x: position%gameSystem.tileGrid.width,
+            y: Math.floor(position/gameSystem.tileGrid.width)
         } 
         this.dim = {
             w: other ? this.source.width : this.source.height,
@@ -219,8 +216,8 @@ class MultiBuilding extends Building
         for(let ix = 0;ix < this.dim.w;ix++)
             for(let iy = 0;iy < this.dim.h;iy++)
             {
-                if (gameSystem.tileGrid[this.position.x - ix][this.position.y - iy] == this) continue
-                gameSystem.tileGrid[this.position.x - ix][this.position.y - iy] = new Reference(this)
+                if (gameSystem.tileGrid.get(this.position.x - ix,this.position.y - iy) == this) continue
+                gameSystem.tileGrid.set(this.position.x - ix,this.position.y - iy,new Reference(this))
             }
     }
 
@@ -251,7 +248,7 @@ class MultiBlockType extends BuildingType
         let grid = this.floor ? gameSystem.tileGridUnder : gameSystem.tileGrid
         for(let ix = 0;ix < cx;ix++)
             for(let iy = 0;iy < cy;iy++)
-                if (grid[x-ix][y-iy] != null || x-ix < 0 || y-iy < 0)
+                if (!(grid.get(x-ix,y-iy) instanceof noBuild) || x-ix < 0 || y-iy < 0)
                     return false
         return true
     }
@@ -290,8 +287,19 @@ class Reference
 }
 class noBuild
 {
-    constructor()
-    {}
-    getSprite() {return "./img/buildings/empty.png"}
+    constructor(args)
+    {
+        this.floor = args[0]
+        this.source = this;
+        this.heightDiff = 0
+    }
+    getSprite() {
+        if(gameSystem.drawPlace && gameSystem.towerSelected.floor != !this.floor)
+        {
+            return "./img/buildings/empty.png"
+        }
+        return ""
+    }
+    spriteOffset() {return [-4,0]}
     update() {}
 }
