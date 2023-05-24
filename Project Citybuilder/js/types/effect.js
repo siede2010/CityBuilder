@@ -117,3 +117,32 @@ class Rain
         drawer.remove(this.rainDraw.id)
     }
 }
+class Flash
+{
+    static create(duration)
+    {
+        let a = drawer.addDraw((drawElem,args) => {
+            drawFill(drawElem,0,0,gameSystem.canvas.width,gameSystem.canvas.height,"rgba(255,255,255,"+ (args[0][0]--/args[0][1]) +")")
+            if (args[0][0] <= 0)
+                drawer.remove(a.id)
+        },[duration,duration])
+    }
+}
+class CloudsType extends RainType
+{
+    constructor(sprite)
+    {
+        super(sprite,null,null,null)
+    }
+    create = function(intensity,duration)
+    {
+        return new Cloud(duration)
+    }
+}
+class Cloud 
+{
+    constructor(duration)
+    {
+        this.duration = duration;
+    }
+}
