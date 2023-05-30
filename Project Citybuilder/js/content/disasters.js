@@ -8,6 +8,9 @@ function disasters()
         let ty = (elem.fy-elem.y)/Length
         elem.x+=tx + Math.random() - 0.5;
         elem.y+=ty + Math.random() - 0.5;
+        let tilesNear = gameSystem.tilesNear(elem.x,elem.y+46,20)
+        for(let i in tilesNear)
+            gameSystem.tileGrid.set(tilesNear[i],new noBuild(false))
         if (Length < 2)
             elem.arr = true;
     }

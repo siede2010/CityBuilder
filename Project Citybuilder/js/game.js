@@ -73,10 +73,20 @@ class Grid2D
                 this.list.push(null)
         } else {
             for(let i = size*size;i > 0;i--)
-                if(args.length > 0)
+                if(args.length > 0) 
                     this.list.push(new cons(args))
-                else
-                    this.list.push(new cons())
+                else {
+                    if (typeof cons == "function")
+                        this.list.push(new cons())
+                    else if (typeof cons == "object") {
+                        let obj = {}
+                        for(let ci in cons)
+                            obj[ci] = cons[ci]
+                        this.list.push(obj)
+                    } else {
+                        this.list.push(cons)
+                    }
+                }
         }
     }
 
@@ -85,9 +95,12 @@ class Grid2D
         return this.list[x+y*this.width];
     }
 
-    set(x,y,value)
+    set(x,y,value = undefined)
     {
-        this.list[x+y*this.width] = value;
+        if (value == undefined)
+            this.list[x] = y;
+        else
+            this.list[x+y*this.width] = value;
     }
 
     index(i)
@@ -160,6 +173,8 @@ class GameSystem
 
         this.gameSize = { x:size*tilesize.x, 
                           y:size*tilesize.y}
+
+        this.tileGridPos = new Grid2D(size,{x:0,y:0})
 
         //Floor Ground Tile Set
         this.tileGridUnder = new Grid2D(size,noBuild,true)
@@ -281,7 +296,7 @@ class GameSystem
                     this.canvas.width/2
 
                     let y = 25 + (iy+ix) * tilesize.y/2
-
+                    this.tileGridPos.set(ind,{x:x,y:y})
                     drawer.addDraw((drawer,args) => {
                         let index = args[0];
                         let fx = args[1];
@@ -437,6 +452,20 @@ class GameSystem
             case 3: //Bottom
                 return [Math.random()*this.canvas.width,this.canvas.height]
         }
+    }
+
+    tilesNear(x,y,range = 16)
+    {
+        let tilesInRange = []
+        let ind = 0;
+        this.tileGridPos.forEach(cPos => {
+            let cDis = {x:cPos.x-x,y:cPos.y-y}
+            let tDis = Math.abs(cDis.x) + Math.abs(cDis.y/2)
+            if (tDis <= range)
+                tilesInRange.push(ind)
+            ind++
+        })
+        return tilesInRange;
     }
 
     timerUp(string)
