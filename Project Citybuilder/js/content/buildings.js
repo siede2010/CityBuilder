@@ -68,6 +68,13 @@ function buildings()
         self.type = type.work
         self.turnable = false
     })
+    park = new BuildingType("park").getThis((self) => {
+        self.setStat(stats.nature,4)
+        self.setStat(stats.happiness,3)
+        self.setStat(stats.cost, -4)
+        self.type = type.happiness
+        self.turnable = false
+    })
     fillin = new BuildingType("fillin").getThis((self) => {
         self.setStat(stats.cost,-2)
         self.type = type.happiness
