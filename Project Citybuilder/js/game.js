@@ -286,6 +286,20 @@ class GameSystem
             drawImageWithScale(drawer,"./img/polyWater.png",0,0,args[0],args[1])
         },(size+1)*tilesize.x/2,(size+1)*tilesize.y/2)
 
+        let listOfRockPos = []
+        for(let y = this.canvas.height/2;y>=-tilesize.y*2;y-=tilesize.y/2)
+            for(let x = this.canvas.width/1.6;y+x<=this.canvas.width;x+=tilesize.x)
+            {
+                let cX = x + y*2;
+                listOfRockPos.push({x:cX,y:y})
+            }
+        listOfRockPos = listOfRockPos.reverse()
+        drawer.addDraw((drawer,args)=>{ //rockDrawer
+            let list = args[0]
+            for(let i in list)
+                drawImage(drawer,"./img/Rock.png",list[i].x,list[i].y)
+        },listOfRockPos)
+
         //Bottom
         let offsetFSide = (this.canvas.width-this.gameSize.x)/2
         for(let ix = 0;ix<size;ix++)
