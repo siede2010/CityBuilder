@@ -347,7 +347,7 @@ class GameSystem
             let y = this.selectableTool[s][1];
             drawer.addDrawUI((drawer,args) => {
                 let tower = this.towers[args[0]][this.selectedTower[args[0]]]
-                drawImage(drawer,tower.getIcon(),args[1]+4,args[2],64,64)
+                drawImage(drawer,tower.getIcon(),args[1]+ (tower instanceof MultiBlockType ? 0 : 4),args[2],64,64)
             },this.selectableTool[s][2],x+toolOffset,this.floor+y)
         }
 

@@ -66,6 +66,7 @@ class BuildingType
         this.type = type.none
         this.floor = false
         this.turnable = false
+        this.rotations = 4;
         for(let i in stats)
             this.stats.push([stats[i],0])
         allBuildings.push(this)
@@ -101,7 +102,7 @@ class BuildingType
     getSprite(rotation)
     {
         if (this.turnable)
-            return "./img/buildings/" + this.name + "/" + this.name + "-"+rotation+".png"
+            return "./img/buildings/" + this.name + "/" + this.name + "-"+rotation%this.rotations+".png"
         return "./img/buildings/" + this.name + "/" + this.name + ".png"
     }
 
@@ -125,7 +126,7 @@ class BuildingType
             )
         let build = new Building(this)
         if (this.turnable)
-            build.rotation = rotation
+            build.rotation = rotation%this.rotations
         drawer.addDraw((t) => {
             
         })
@@ -223,7 +224,10 @@ class MultiBuilding extends Building
 
     spriteOffset = function()
     {
-        return [this.rotation%2*-24,0]
+        let diff = Math.abs(this.source.width-this.source.height)
+        if (this.source.turnable)
+            return [(this.rotation%2*-24) * diff + this.source.xOffset,0]
+        return [-24 + this.source.xOffset,0]
     }
 
     getSprite = function()
@@ -240,6 +244,7 @@ class MultiBlockType extends BuildingType
         super(name)
         this.width = 1
         this.height = 1
+        this.xOffset = 0;
     }
     canPlace = function(x,y)
     {
@@ -254,7 +259,10 @@ class MultiBlockType extends BuildingType
     }
     spriteOffset = function()
     {
-        return [gameSystem.buildrotation%2*-24,0]
+        let diff = Math.abs(this.width-this.height)
+        if (this.turnable)
+            return [(gameSystem.buildrotation%2*-24) * diff + this.xOffset,0]
+        return [-24 + this.xOffset,0]
     }
     getIcon = function()
     {
@@ -267,7 +275,7 @@ class MultiBlockType extends BuildingType
                 gameStats.filter(p => p[0] == a[0])[0][1].var += a[1]
             }
             )
-        return new MultiBuilding(this,position,rotation)
+        return new MultiBuilding(this,position,rotation%this.rotations)
     }
 }
 class Reference

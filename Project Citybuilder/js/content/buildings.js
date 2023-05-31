@@ -29,6 +29,7 @@ function buildings()
         self.type = type.security
         self.heightDiff = 14
     })
+    /* //House is Bigger than an apartment? yea ok.
     house = new MultiBlockType("house").getThis((self) => {
         self.setStat(stats.cost,-2)
         self.setStat(stats.food,-2)
@@ -40,6 +41,7 @@ function buildings()
         self.height = 2
         self.width = 1
     })
+    */
     road = new RoadType("road").getThis((self) => {
         self.setStat(stats.cost,-1)
         self.type = type.security
@@ -50,7 +52,7 @@ function buildings()
         self.type = type.work
         self.turnable = false
     })
-    powerplant = new BuildingType("powerplant").getThis((self) => {
+    powerplant = new MultiBlockType("power-plant").getThis((self) => {
         self.setStat(stats.cost,-12)
         self.setStat(stats.happiness,-5)
         self.setStat(stats.nature,-12)
@@ -58,8 +60,13 @@ function buildings()
         self.setStat(stats.work,12)
         self.type = type.work
         self.turnable = true
+        self.rotations = 2;
+        self.height = 3;
+        self.width = 2;
+        self.heightDiff = 90;
+        self.xOffset = -32;
     })
-    mall = new BuildingType("mall").getThis((self) => {
+    mall = new MultiBlockType("mall").getThis((self) => {
         self.setStat(stats.food,10)
         self.setStat(stats.nature,-6)
         self.setStat(stats.work,10)
@@ -67,16 +74,20 @@ function buildings()
         self.setStat(stats.cost,-8)
         self.type = type.work
         self.turnable = false
+        self.height = 2;
+        self.width = 2;
+        self.heightDiff = 66;
+        self.xOffset = -4;
     })
-    park = new BuildingType("park").getThis((self) => {
+    park = new MultiBlockType("park").getThis((self) => {
         self.setStat(stats.nature,4)
         self.setStat(stats.happiness,3)
         self.setStat(stats.cost, -4)
         self.type = type.happiness
         self.turnable = false
-    })
-    fillin = new BuildingType("fillin").getThis((self) => {
-        self.setStat(stats.cost,-2)
-        self.type = type.happiness
+        self.width = 2;
+        self.height = 2;
+        self.heightDiff = 66;
+        self.xOffset = -4;
     })
 }
