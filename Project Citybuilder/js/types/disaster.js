@@ -29,6 +29,7 @@ class Disaster{
         let pos = gameSystem.randBorderPos();
         this.x = pos[0];
         this.y = pos[1];
+        this.alpha = 1;
         let pos2 = gameSystem.randBorderPos();
         this.drawLogic = this.source.drawLogic
         this.initLogic = this.source.initLogic
@@ -41,6 +42,7 @@ class Disaster{
             this.drawBase = "./img/disasters/" + this.source.name
         this.initLogic(this)
         this.uElem = drawer.addDraw((drawing,args) => {
+            drawing.globalAlpha = this.alpha
             if (this.source.spritesheet)
             {
                 drawFrame(drawing,this.drawBase + ".png",this.x,this.y,this.source.dim.w,this.source.dim.h,this.frame++)
@@ -50,6 +52,7 @@ class Disaster{
                 this.frame = ++this.frame % this.source.frames
                 drawImage(drawing,this.drawBase + "-" + (this.frame+1) + ".png",this.x,this.y)
             }
+            drawing.globalAlpha = 1
             this.drawLogic(this,drawing);
             if (this.arr)
                 drawer.remove(this.uElem.id)

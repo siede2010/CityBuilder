@@ -10,12 +10,16 @@ function disasters()
         elem.y+=ty + Math.random() - 0.5;
         let tilesNear = gameSystem.tilesNear(elem.x,elem.y+46,20)
         for(let i in tilesNear)
-            gameSystem.tileGrid.index(tilesNear[i]).remove()
-        if (Length < 2)
+            if (!(gameSystem.tileGrid.index(tilesNear[i]) instanceof noBuild)) {
+                gameSystem.tileGrid.index(tilesNear[i]).remove()
+                elem.alpha = --elem.data.hp / 5;
+            }
+        if (Length < 2 || elem.data.hp < 1)
             elem.arr = true;
     }
     tornado.initLogic = (elem) => {
         rain.create(1,30);
+        elem.data.hp = 5;
     }
     badweather = new DisasterType("lightning",12,6,true,32,64)
     badweather.drawLogic = (elem,drawer) => {

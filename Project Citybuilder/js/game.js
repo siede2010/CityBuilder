@@ -8,6 +8,7 @@ function game() {
         gameStats[i] = 0
 }
 let gameSystem
+let barInterv = []
 
 function addBar(ui,trackValue)
 {
@@ -51,6 +52,7 @@ function addBar(ui,trackValue)
             barIn.style.width = track + "%"
         }
     },100)
+    barInterv.push(interval)
     barIn.color = function(colorstring)
     {
         this.style = "background-color: #" + colorstring + ";"
@@ -196,7 +198,6 @@ class GameSystem
                     this.tileGridUnder.set(this.gridSelected.x,this.gridSelected.y,tower.build(this.buildrotation,this.gridSelected.y * this.tileGrid.width + this.gridSelected.x))
                 else 
                     this.tileGrid.set(this.gridSelected.x,this.gridSelected.y,tower.build(this.buildrotation,this.gridSelected.y * this.tileGrid.width + this.gridSelected.x))
-                console.log(this.gridSelected.y * this.tileGrid.width + this.gridSelected.x)
             }
             //Index Select
             if (this.hoverIndex != -1)
@@ -482,7 +483,7 @@ class GameSystem
     timerUp(string)
     {
         this.canvas.remove()
-        barUpdates.forEach(u => clearInterval(u))
+        barInterv.forEach(b=>clearInterval(b))
         score(0,string)
     }
 
@@ -654,7 +655,7 @@ function initiateTutorial()
     gameSystem = new GameSystem(4,30,gameUI,gameStats,60)
     gameSystem.tileGrid.set(0,0,forest.build(0))
     loadBars()
-    gameStats.cost.var = 1000
+    gameStats.cost = 1000
 }
 function loadBars()
 {
