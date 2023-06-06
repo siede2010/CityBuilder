@@ -1,30 +1,44 @@
 let stats = {
-    happiness:"Happiness",
-    population:"Population",
-    nature:"Nature",
-    safety:"Safety",
-    work:"Work",
-    food:"Food",
-    economics:"Economics",
-    energy:"Energy",
-    healthCare:"HealthCare",
-    education:"Education",
-    cost:"Cost",
-    trust:"Trust"
+    happiness:"happiness",
+    population:"population",
+    nature:"nature",
+    safety:"safety",
+    work:"work",
+    food:"food",
+    economics:"economics",
+    energy:"energy",
+    healthCare:"healthCare",
+    education:"education",
+    cost:"cost",
+    trust:"trust"
 }
+let numberStat = [
+    "happiness",
+    "population",
+    "nature",
+    "safety",
+    "work",
+    "food",
+    "economics",
+    "energy",
+    "healthCare",
+    "education",
+    "cost",
+    "trust"
+]
 let statStartValue = {
-    Happiness:0,
-    Population:0,
-    Nature:40,
-    Safety:0,
-    Work:0,
-    Food:50,
-    Economics:0,
-    Energy:0,
-    HealthCare:0,
-    Education:0,
-    Cost:100,
-    Trust:0
+    happiness:0,
+    population:0,
+    nature:40,
+    safety:0,
+    work:0,
+    food:50,
+    economics:0,
+    energy:0,
+    healthCare:0,
+    education:0,
+    cost:100,
+    trust:0
 }
 let colors = {
     blue : "",

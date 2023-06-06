@@ -9,14 +9,15 @@ function getBuildingsOfType(selectedType)
 let allBuildings = []
 class Building
 {
-    constructor(source)
+    constructor(source,position)
     {
         this.name = source.name
         this.source = source
+        this.position = position
         this.rotation = 0
-        this.extraStats = []
+        this.extraStats = {}
         for(let i in stats)
-            this.extraStats.push([stats[i],0])
+            this.extraStats[i] = 0
     }
 
     spriteOffset = function()
@@ -26,7 +27,7 @@ class Building
 
     getStat(stat)
     {
-        return [stat,this.source.stats.filter(p => p[0] == stat)[0][1] + this.extraStats.filter(p => p[0] == stat)[0][1]]
+        return this.source.stats[stat] + this.extraStats[stat]
     }
     
     getAllStats()
@@ -52,7 +53,12 @@ class Building
 
     update()
     {
-        gameStats.filter(p => p[0] == "Food")[0][1].var += this.source.stats.filter(s => s[0] == stats.food)[0][1]/30
+        gameStats.food += this.getStat(stats.food)/30
+    }
+
+    remove() {
+        let grid = this.source.floor ? gameSystem.tileGridUnder : gameSystem.tileGrid
+        grid.set(this.position,new noBuild([this.source.floor]))
     }
 
 }
@@ -62,13 +68,13 @@ class BuildingType
     {
         this.name = name
         this.heightDiff = 0
-        this.stats = []
+        this.stats = {}
         this.type = type.none
         this.floor = false
         this.turnable = false
         this.rotations = 4;
         for(let i in stats)
-            this.stats.push([stats[i],0])
+            this.stats[i] = 0
         allBuildings.push(this)
     }
     canPlace(x,y)
@@ -79,7 +85,7 @@ class BuildingType
 
     getStat(stat)
     {
-        return this.stats.filter(p => p[0] == stat)[0]
+        return this.stats[stat]
     }
 
     spriteOffset()
@@ -89,7 +95,7 @@ class BuildingType
 
     setStat(stat,value)
     {
-        this.getStat(stat)[1] = value
+        this.stats[stat] = value
         return this
     }
 
@@ -119,18 +125,18 @@ class BuildingType
     }
     build(rotation,pos)
     {
-        this.stats.forEach(a =>
-            {
-                gameStats.filter(p => p[0] == a[0])[0][1].var += a[1]
-            }
-            )
-        let build = new Building(this)
+        this.pay();
+        let build = new Building(this,pos)
         if (this.turnable)
             build.rotation = rotation%this.rotations
-        drawer.addDraw((t) => {
-            
-        })
         return build
+    }
+    pay()
+    {
+        for (let stat in this.stats)
+        {
+            gameStats[stat] += this.stats[stat]
+        }
     }
 }
 //road
@@ -138,7 +144,8 @@ class Road extends Building
 {
     constructor(source,position)
     {
-        super(source)
+        super(source,position)
+        this.connections = 0;
         this.position = {
             x: position%gameSystem.tileGrid.width,
             y: Math.floor(position/gameSystem.tileGrid.width)
@@ -166,6 +173,13 @@ class Road extends Building
             c = gameSystem.tileGridUnder.get(this.position.x,this.position.y-1)
         if (!blocked[1] && this.position.y > 0 && c != null && c.source == this.source)
             i+=2
+            /*
+        if (i != 0 && i != connections)
+        {
+            connections = i;
+            this.source.connectEvent(this)
+        }
+        */
         return "./img/road/" + this.name + "-" + i + ".png"
     }
 }
@@ -191,11 +205,7 @@ class RoadType extends BuildingType
     }
     build = function(r,position)
     {
-        this.stats.forEach(a =>
-            {
-                gameStats.filter(p => p[0] == a[0])[0][1].var += a[1]
-            }
-            )
+        this.pay();
         return new Road(this,position)
     }
 }
@@ -203,9 +213,10 @@ class MultiBuilding extends Building
 {
     constructor(source,position,rotation)
     {
-        super(source)
+        super(source,rotation)
         this.rotation = rotation
         let other = this.rotation%2 == 0
+        this.tiles = []
         this.position = {
             x: position%gameSystem.tileGrid.width,
             y: Math.floor(position/gameSystem.tileGrid.width)
@@ -219,6 +230,7 @@ class MultiBuilding extends Building
             {
                 if (gameSystem.tileGrid.get(this.position.x - ix,this.position.y - iy) == this) continue
                 gameSystem.tileGrid.set(this.position.x - ix,this.position.y - iy,new Reference(this))
+                this.tiles.push({x:this.position.x - ix,y:this.position.y - iy})
             }
     }
 
@@ -235,6 +247,12 @@ class MultiBuilding extends Building
         if (this.source.turnable)
             return "./img/buildings/" + this.name + "/" + this.name + "-" + this.rotation + ".png"
         return "./img/buildings/" + this.name + "/" + this.name + ".png"
+    }
+    remove = function() {
+        let grid = this.source.floor ? gameSystem.tileGridUnder : gameSystem.tileGrid
+        grid.set(this.position,new noBuild([this.source.floor]))
+        for(let tile in this.tiles)
+            grid.set(this.tiles[tile].x,this.tiles[tile].y,new noBuild([this.source.floor]))
     }
 }
 class MultiBlockType extends BuildingType
@@ -270,11 +288,7 @@ class MultiBlockType extends BuildingType
     }
     build = function(rotation,position)
     {
-        this.stats.forEach(a =>
-            {
-                gameStats.filter(p => p[0] == a[0])[0][1].var += a[1]
-            }
-            )
+        this.pay();
         return new MultiBuilding(this,position,rotation%this.rotations)
     }
 }
@@ -292,6 +306,9 @@ class Reference
     update() {return}
     getSprite() {return ""}
     spriteOffset() {return [0,0]}
+    remove() {
+        this.ref.remove()
+    }
 }
 class noBuild
 {
@@ -310,4 +327,5 @@ class noBuild
     }
     spriteOffset() {return [-4,0]}
     update() {}
+    remove() {}
 }

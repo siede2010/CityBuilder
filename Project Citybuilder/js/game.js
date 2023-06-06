@@ -3,14 +3,12 @@ let gameUI,bars,gameStats
 function game() {
     gameUI = getElementById(hidden,"gameUi")
     bars = getElementById(getElementById(gameUI,"row1"),"bars")
-    gameStats = []
+    gameStats = {}
     for (let i in stats)
-        gameStats.push([stats[i],new GlobalVar(statStartValue[stats[i]]).setName(stats[i])])
+        gameStats[i] = 0
 }
 let gameSystem
 
-let barUpdates = []
-let barIndex = 0
 function addBar(ui,trackValue)
 {
     let barOut = document.createElement("div")
@@ -23,43 +21,42 @@ function addBar(ui,trackValue)
     let b = document.createElement("b")
     barIn.append(b)
     barOut.addEventListener("mouseenter",(e) => {
-        b.innerText = trackValue.name
+        b.innerText = trackValue
     })
     barOut.addEventListener("mouseleave",(e) => {
         b.innerText = ""
     })
-    barUpdates.push([setInterval(updateBar,100),trackValue,barIn,0])
+    let indexer = 0;
+    let interval = setInterval(() => {
+        let track = gameStats[trackValue]
+        let name = trackValue
+
+        if (track < 0)
+        {
+            if (track < dangerLimit[name] )
+            {
+                indexer++;
+                indexer%=2;
+                barIn.style = "background-color: #" + (indexer == 0 ? "ff0000" : "ff4444") +" !important; margin-left:auto ;margin-right:0"
+                barIn.style.width = track * -1 + "%"
+            }
+            else {
+                barIn.style = "background-color: #ff0000 !important; margin-left:auto ;margin-right:0"
+                barIn.style.width = track * -1 + "%"
+            }
+        }
+        else
+        {
+            barIn.style = "background-color: #" + barIn.color + ";"
+            barIn.style.width = track + "%"
+        }
+    },100)
     barIn.color = function(colorstring)
     {
         this.style = "background-color: #" + colorstring + ";"
         this.color = colorstring
     }
     return barIn
-}
-function updateBar()
-{
-
-    if (barUpdates[barIndex][1].getVar() < 0)
-    {
-        if (barUpdates[barIndex][1].getVar() < dangerLimit[barUpdates[barIndex][1].name] )
-        {
-            barUpdates[barIndex][3]++;
-            barUpdates[barIndex][3]%=2;
-            barUpdates[barIndex][2].style = "background-color: #" + (barUpdates[barIndex][3] == 0 ? "ff0000" : "ff4444") +" !important; margin-left:auto ;margin-right:0"
-            barUpdates[barIndex][2].style.width = barUpdates[barIndex][1].getVar() * -1 + "%"
-        }
-        else {
-            barUpdates[barIndex][2].style = "background-color: #ff0000 !important; margin-left:auto ;margin-right:0"
-            barUpdates[barIndex][2].style.width = barUpdates[barIndex][1].getVar() * -1 + "%"
-        }
-    }
-    else
-    {
-        barUpdates[barIndex][2].style = "background-color: #" + barUpdates[barIndex][2].color + ";"
-        barUpdates[barIndex][2].style.width = barUpdates[barIndex][1].getVar() + "%"
-    }
-    barIndex++;
-    barIndex%=barUpdates.length
 }
 
 class Grid2D
@@ -434,11 +431,11 @@ class GameSystem
             drawFrame(draw,"./img/testSprite.png",10,20,32,32,args[0][1]++ == 0 ? args[0][0]++ : args[0][0])
             args[0][0]%=8;
             args[0][1]%=4;
-            let st = gameStats.find(i=>i[0] == "Cost")[1]
+            let st = gameStats.cost
             drawer.textStyle(22,"serif","#000000")
-            drawer.drawText(40,50,st.getVar() + "")
+            drawer.drawText(40,50,st + "")
             drawer.textStyle(20,"serif","#ffffaa")
-            drawer.drawText(42,49,st.getVar() + "")
+            drawer.drawText(42,49,st + "")
         },[0,0])
 
 
@@ -499,9 +496,7 @@ class GameSystem
         {
             disasterList[Math.floor(Math.random()*disasterList.length)].create(1,30)
             this.interV%= 30;
-            gameStats.find(g=>g[0] == "Cost")[1].var+= 
-                gameStats.find(g=>g[0] == "Economics")[1].var * 
-                gameStats.find(g=>g[0] == "Work")[1].var
+            gameStats.cost += gameStats.economics * gameStats.work
         }
         if (this.timer <= 0)
         {
@@ -513,14 +508,19 @@ class GameSystem
         this.tileGridUnder.forEach((t) => {t.update()})
         if(this.isGameOver())
         {
-            this.timerUp("Defeat : " + defeatStatement[gameStats.filter(p => p[1].var <= gameOverStats[p[0]])[0][0]])
+            this.timerUp("Defeat : " + defeatStatement.find((name,value) => value <= gameOverStats[name]))
             this.destroy()
         }
     }
 
     isGameOver()
     {
-        return gameStats.filter(p => p[1].var <= gameOverStats[p[0]]).length != 0
+        for (let name in gameStats)
+        {
+            if (gameStats[name] <= gameOverStats[name]) 
+                return true
+        }
+        return false;
     }
 
     destroy()
@@ -596,7 +596,6 @@ class GameSystem
             }
         drawer.fillStyle = "#000000"
         drawer.fillText("Time Left : " + Math.floor(this.timer/60) + ":" + this.timer%60, this.canvas.width-125, 20)
-        drawer.fillText("Money : " + gameStats.filter(g=>g[0] == "Cost")[0][1].getVar(), 10, 20)
         if (this.MousePos.filter(i => i==0).length == 0)
             this.drawSelect()
             */
@@ -655,21 +654,21 @@ function initiateTutorial()
     gameSystem = new GameSystem(4,30,gameUI,gameStats,60)
     gameSystem.tileGrid.set(0,0,forest.build(0))
     loadBars()
-    gameStats.find(g=>g[0] == "Cost")[1].var = 1000
+    gameStats.cost.var = 1000
 }
 function loadBars()
 {
-    for (let i in stats)
-        gameStats.find(p=> p[0] == stats[i])[1] = new GlobalVar(statStartValue[stats[i]]).setName(stats[i])
-    addBar(bars,gameStats[0][1]).className += colors.lime
-    addBar(bars,gameStats[1][1]).className += colors.turkis
-    addBar(bars,gameStats[2][1]).className += colors.lime
-    addBar(bars,gameStats[3][1]).className += colors.red
-    addBar(bars,gameStats[4][1]).className += colors.yellow
-    addBar(bars,gameStats[5][1]).className += colors.yellow
-    addBar(bars,gameStats[6][1]).className += colors.turkis
-    addBar(bars,gameStats[7][1]).className += colors.blue
-    addBar(bars,gameStats[8][1]).className += colors.lime
-    addBar(bars,gameStats[9][1]).color("00DD99")
-    addBar(bars,gameStats[11][1]).className += colors.lime
+    for (let i in gameStats)
+        gameStats[i] = statStartValue[stats[i]]
+    addBar(bars,numberStat[0]).className += colors.lime
+    addBar(bars,numberStat[1]).className += colors.turkis
+    addBar(bars,numberStat[2]).className += colors.lime
+    addBar(bars,numberStat[3]).className += colors.red
+    addBar(bars,numberStat[4]).className += colors.yellow
+    addBar(bars,numberStat[5]).className += colors.yellow
+    addBar(bars,numberStat[6]).className += colors.turkis
+    addBar(bars,numberStat[7]).className += colors.blue
+    addBar(bars,numberStat[8]).className += colors.lime
+    addBar(bars,numberStat[9]).color("00DD99")
+    addBar(bars,numberStat[11]).className += colors.lime
 }

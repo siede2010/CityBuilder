@@ -10,7 +10,7 @@ function disasters()
         elem.y+=ty + Math.random() - 0.5;
         let tilesNear = gameSystem.tilesNear(elem.x,elem.y+46,20)
         for(let i in tilesNear)
-            gameSystem.tileGrid.set(tilesNear[i],new noBuild(false))
+            gameSystem.tileGrid.index(tilesNear[i]).remove()
         if (Length < 2)
             elem.arr = true;
     }

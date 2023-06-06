@@ -1,4 +1,4 @@
-let apartment,forest,road,smallHospital,house,solarPannel,powerplant,fillin
+let apartment,forest,road,smallHospital,solarPannel,powerplant,fillin
 function buildings()
 {
     
@@ -24,7 +24,6 @@ function buildings()
         self.setStat(stats.food,-1)
         self.setStat(stats.cost,-4)
         self.setStat(stats.happiness,1)
-        self.setStat(stats.work,2)
         self.turnable = false
         self.type = type.security
         self.heightDiff = 14
@@ -41,7 +40,7 @@ function buildings()
         self.height = 2
         self.width = 1
     })
-    */
+    */ 
     road = new RoadType("road").getThis((self) => {
         self.setStat(stats.cost,-1)
         self.type = type.security
@@ -70,19 +69,21 @@ function buildings()
         self.setStat(stats.food,10)
         self.setStat(stats.nature,-6)
         self.setStat(stats.work,10)
-        self.setStat(stats.energy,-5)
+        self.setStat(stats.energy,-15)
         self.setStat(stats.cost,-8)
+        self.setStat(stats.happiness,2)
         self.type = type.work
         self.turnable = false
         self.height = 2;
         self.width = 2;
         self.heightDiff = 66;
         self.xOffset = -4;
-    })
+    }) 
     park = new MultiBlockType("park").getThis((self) => {
         self.setStat(stats.nature,4)
-        self.setStat(stats.happiness,3)
-        self.setStat(stats.cost, -4)
+        self.setStat(stats.happiness,6)
+        self.setStat(stats.work,-1)
+        self.setStat(stats.cost,-4)
         self.type = type.happiness
         self.turnable = false
         self.width = 2;
