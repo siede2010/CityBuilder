@@ -32,13 +32,16 @@
         <div id="optionScreen" style="color:white;">
             <h1 class="center"><b>Options</b></h1><br>
             <button class="btn btn-danger" onclick="goMain()" style="color:white;position: absolute;right:0;top:0"><b>X</b></button>
-            <b class="center">Difficulty.</b>
-            <select value="Medium" class="center" style="font-weight: bold;">
+            <label for="diff" class="center"><b>Difficulty.</b></label>
+            <select id="diff" class="center option" default="1" style="font-weight: bold;">
                 <option style="color:lime"><b>Easy</b></option>
                 <option style="color:yellow"><b>Medium</b></option>
                 <option style="color:red"><b>Hard</b></option>
                 <option style="color:purple"><b>Chaos</b></option>
             </select>
+            <br>
+            <label for="flash" class="center"><b>Enable Flash</b></label>
+            <input id="flash"  class="center option" type="checkbox" checked="true">
         </div>
         <div id="infoScreen" style="color:white;">
             <h1 class="center"><b>Info</b></h1><br>

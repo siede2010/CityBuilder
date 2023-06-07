@@ -12,6 +12,37 @@ let stats = {
     cost:"cost",
     trust:"trust"
 }
+let optionSetting = {}
+function addOption(elem)
+{
+    optionSetting[elem.id] = 0;
+    switch(elem.tagName.toLowerCase()) {
+        case "select":
+            elem.addEventListener("change",() => {
+                optionSetting[elem.id] = elem.selectedIndex
+            })
+            if (elem.attributes.default == undefined)
+                elem.selectedIndex = 0;
+            else {
+                elem.selectedIndex = parseInt(elem.attributes.default.nodeValue)
+                optionSetting[elem.id] = elem.selectedIndex
+            }
+            break;
+        case "input":
+            if (elem.type == "checkbox") {
+                elem.addEventListener("change",() => {
+                    optionSetting[elem.id] = elem.checked ? 1 : 0
+                })
+            }
+            break;
+        default:
+            break;
+    }
+}
+let o = document.getElementsByClassName("option")
+for(let oi = 0;oi<o.length;oi++)
+    addOption(o[oi])
+
 let numberStat = [
     "happiness",
     "population",

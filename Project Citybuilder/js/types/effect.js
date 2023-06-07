@@ -121,6 +121,7 @@ class Flash
 {
     static create(duration)
     {
+        if (optionSetting.flash == 0) return;
         let a = drawer.addDraw((drawElem,args) => {
             drawFill(drawElem,0,0,gameSystem.canvas.width,gameSystem.canvas.height,"rgba(255,255,255,"+ (args[0][0]--/args[0][1]) +")")
             if (args[0][0] <= 0)
