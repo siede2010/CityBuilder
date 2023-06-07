@@ -91,4 +91,18 @@ function buildings()
         self.heightDiff = 66;
         self.xOffset = -4;
     })
+    farm = new MultiBlockType("farm").getThis((self) => {
+        self.setStat(stats.food,15)
+        self.setStat(stats.work,10)
+        self.setStat(stats.happiness,4)
+        self.setStat(stats.nature,-6)
+        self.setStat(stats.energy,-6)
+        self.setStat(stats.cost,-6)
+        self.type = type.work
+        self.turnable = true
+        self.height = 3;
+        self.width = 2;
+        self.heightDiff = 90;
+        self.xOffset = -32;
+    })
 }
