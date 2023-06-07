@@ -1,5 +1,6 @@
 let tilesize = {x:48,y:24}
 let gameUI,bars,gameStats
+let audio = document.getElementById("mainSong");
 function game() {
     gameUI = getElementById(hidden,"gameUi")
     bars = getElementById(getElementById(gameUI,"row1"),"bars")
@@ -118,6 +119,10 @@ class GameSystem
     constructor(size,margin,vessel,stats,startTimer = 240)
     {
         //Static variables
+        audio.currentTime = 0;
+        audio.volume = optionSetting.volume
+        audio.play();
+        this.lastU = 0;
         this.gameStats = stats
         let canvasX = Math.max(size*tilesize.x,320);
         let canvasY = size*tilesize.y+64+64;
@@ -126,6 +131,9 @@ class GameSystem
         this.buildrotation = 0
         this.particles = []
         this.clickPos = [0,0]
+        this.intervalBetween = 30;
+        if (startTimer > 60)
+            this.intervalBetween = [60,30,30,15][optionSetting.diff]
         this.timer = startTimer;
         this.gridSelected = {
             x:-1,
@@ -139,7 +147,7 @@ class GameSystem
             [60,16,"nature"],
             [108,16,"population"],
             [156,16,"work"],
-            [202,16,"happiness"],
+            [202,16,"happiness"]
         ]
         this.typeOrder = [
             type.security,
@@ -427,7 +435,7 @@ class GameSystem
             drawFill(drawer,Math.max((args[0]-3) * (this.timer/startTimer)-15,6),7,20,3,colors[1])
             for(let ti = 1;ti < args[1];ti++)
                 drawFill(drawer,args[0] * ti/args[1],5,2,10,"#000000")
-        },this.canvas.width-10,startTimer/30);
+        },this.canvas.width-10,startTimer/this.intervalBetween);
         drawer.addDrawUI((draw,args)=>{
             drawFrame(draw,"./img/testSprite.png",10,20,32,32,args[0][1]++ == 0 ? args[0][0]++ : args[0][0])
             args[0][0]%=8;
@@ -485,18 +493,22 @@ class GameSystem
         this.canvas.remove()
         barInterv.forEach(b=>clearInterval(b))
         score(0,string)
+        audio.pause();
     }
 
     intervalupdate() {gameSystem.update()}
 
     update()
     {
-        this.timer-=32/1000;
-        this.interV+=32/1000;
-        if (this.interV > 30)
+        let dif = audio.currentTime - this.lastU;
+        this.timer-=dif;
+        this.interV+=dif;
+        this.lastU = audio.currentTime;
+        if (audio.currentTime == audio.duration) this.timer = 0;
+        if (this.interV > this.intervalBetween)
         {
             disasterList[Math.floor(Math.random()*disasterList.length)].create(1,30)
-            this.interV%= 30;
+            this.interV%= this.intervalBetween;
             gameStats.cost += gameStats.economics * gameStats.work
         }
         if (this.timer <= 0)
@@ -509,7 +521,12 @@ class GameSystem
         this.tileGridUnder.forEach((t) => {t.update()})
         if(this.isGameOver())
         {
-            this.timerUp("Defeat : " + defeatStatement.find((name,value) => value <= gameOverStats[name]))
+            for(let name in gameStats)
+                if (gameStats[name] <= gameOverStats[name])
+                {
+                    this.timerUp("Defeat : " + defeatStatement[name]);
+                    break;
+                }
             this.destroy()
         }
     }
@@ -536,100 +553,6 @@ class GameSystem
         let rect = canvas.getBoundingClientRect()
         return [click.clientX - rect.left,click.clientY - rect.top]
     }
-        /*
-        let drawer = this.canvas.getContext("2d")
-        let size = this.tileGrid.length
-        drawer.font = "18px serif";
-        drawer.fillStyle = "#4db938"
-        drawer.fillRect(0,0,this.canvas.width,this.canvas.height)
-        this.toolUpdate()
-        let sideOffset = (this.canvas.width-this.gameSize.x)/2
-        let towerFloor = false
-        if (this.drawPlace)
-            towerFloor = this.towers[this.typeOrder[this.selectedIndex]][this.selectedTower[this.typeOrder[this.selectedIndex]]].floor
-        //Draw Sea
-        for(let i1 = 0;i1<size-1;i1++)
-            for(let i2 = 0;i2<2*i1-1;i2++)
-            {
-                let x = i1 * tilesize.x - i2 * (tilesize.x / 2) - sideOffset - (tilesize.x / 2) - tilesize.x
-                let y = i2 * (tilesize.y / 2) - (tilesize.y / 2) - 2 - tilesize.y
-                switch (size-i1-2)
-                {
-                    case 0:
-                        drawImage(drawer,"./img/environment/sea-land.png",x,y)
-                        break;
-                    case 1:
-                        drawImage(drawer,"./img/environment/sea-deep1.png",x,y)
-                        break;
-                    case 2:
-                        drawImage(drawer,"./img/environment/sea-deep2.png",x,y)
-                        break;
-                    default:
-                        drawImage(drawer,"./img/environment/sea-deep-max.png",x,y)
-                        break;
-                }
-            }
-        //Bottom
-        for(let ix = 0;ix<size;ix++)
-            for(let iy = 0;iy<size;iy++)
-                {
-                    let x = ((tilesize.x/2)*(size-2)+(tilesize.x/2)*ix-tilesize.y*iy+this.offset[0]+sideOffset)
-                    let y = ((tilesize.y/2)*ix+(tilesize.y/2)*iy-tilesize.x+this.offset[1])
-                    if (this.tileGridUnder[ix][iy] == null) {
-                        if (this.drawPlace && towerFloor) 
-                            drawImage(drawer,"./img/buildings/empty.png",x,y)
-                    }
-                    else
-                        drawImage(drawer,this.tileGridUnder[ix][iy].getSprite(),x+this.tileGridUnder[ix][iy].spriteOffset()[0],y-this.tileGridUnder[ix][iy].source.heightDiff+this.tileGridUnder[ix][iy].spriteOffset()[1])
-                }
-        //Top
-        for(let ix = 0;ix<size;ix++)
-            for(let iy = 0;iy<size;iy++)
-            {
-                let x = ((tilesize.x/2)*(size-2)+(tilesize.x/2)*ix-tilesize.y*iy+this.offset[0]+sideOffset)
-                let y = ((tilesize.y/2)*ix+(tilesize.y/2)*iy-tilesize.x+this.offset[1])
-                if (this.tileGrid[ix][iy] == null) {
-                    if (this.drawPlace && !towerFloor) 
-                        drawImage(drawer,"./img/buildings/empty.png",x,y)
-                }
-                else
-                    drawImage(drawer,this.tileGrid[ix][iy].getSprite(),x+this.tileGrid[ix][iy].spriteOffset()[0],y-this.tileGrid[ix][iy].source.heightDiff+this.tileGrid[ix][iy].spriteOffset()[1])
-            }
-        drawer.fillStyle = "#000000"
-        drawer.fillText("Time Left : " + Math.floor(this.timer/60) + ":" + this.timer%60, this.canvas.width-125, 20)
-        if (this.MousePos.filter(i => i==0).length == 0)
-            this.drawSelect()
-            */
-
-        /*
-        this.tutorialCanvas = document.createElement("canvas")
-        this.tutorialCanvas.width = this.canvas.width
-        this.tutorialCanvas.height = this.canvas.height
-        this.canvas.parentElement.append(this.tutorialCanvas)
-        this.canvas.remove()
-        let tutDraw = this.tutorialCanvas.getContext("2d")
-        let tempTime = this.timer
-        let texts = text.split('\n')
-        this.timer = 9999999
-        tutDraw.font = "18px serif"
-        tutDraw.fillStyle = "#4db938"
-        tutDraw.fillRect(0,0,this.tutorialCanvas.width,this.tutorialCanvas.height)
-        tutDraw.fillStyle = "#000000"
-        for(let i = 0;i<texts.length;i++)
-            tutDraw.fillText(texts[i],this.tutorialCanvas.width/2-texts[i].length*4,this.tutorialCanvas.height/2 + i * 15 - texts.length * 7.5)
-        tutDraw.fillText("Press anywhere to continue",10,this.tutorialCanvas.height-10)   
-        this.tutorialCanvas.addEventListener("click",(e) => {
-            this.tutorialCanvas.parentElement.append(this.canvas)
-            this.tutorialCanvas.remove()
-            this.timer = tempTime
-        })
-
-    placeDraw(bool)
-    {
-        this.drawPlace = bool
-        this.updateGrid()
-    }
-    */
 }
 
 withinBounds = (x,y,w,h,x2,y2) =>
@@ -646,6 +569,8 @@ function initiateGame()
     m.remove()
     document.body.append(gameUI)
     gameSystem = new GameSystem(10,30,gameUI,gameStats)
+    audio.currentTime = 256 - 240
+    gameSystem.lastU = 256 - 240
     loadBars()
 }
 function initiateTutorial()

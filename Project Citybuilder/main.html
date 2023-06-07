@@ -13,6 +13,10 @@
     <title>CityBuilder</title>
 </head>
 <body>
+    <audio id="mainSong">
+        <source src="./img/mainTheme.wav" type="audio/wav">
+        Could'nt Load Audio
+    </audio>
     <div id="startHidden">
         <div id="gameUi">
             <div id="row1" style="display:flex">
@@ -42,6 +46,9 @@
             <br>
             <label for="flash" class="center"><b>Enable Flash</b></label>
             <input id="flash"  class="center option" type="checkbox" checked="true">
+            <br>
+            <label for="volume" class="center"><b>Volume</b></label>
+            <input id="volume" class="center option" type="range" min="0" max="1" step="0.01" value="1">
         </div>
         <div id="infoScreen" style="color:white;">
             <h1 class="center"><b>Info</b></h1><br>
