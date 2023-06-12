@@ -120,15 +120,18 @@ class GameSystem
     {
         //Static variables
         audio.currentTime = 0;
+        endScore = 0;
         audio.volume = optionSetting.volume
         audio.play();
         this.lastU = 0;
         this.gameStats = stats
-        let canvasX = Math.max(size*tilesize.x,320);
+        let canvasX = Math.max(size*tilesize.x,380);
         let canvasY = size*tilesize.y+64+64;
         this.margin = margin;
         this.drawPlace = false
         this.buildrotation = 0
+        this.disasterI = 0
+        this.disasterC = 0
         this.particles = []
         this.clickPos = [0,0]
         this.intervalBetween = 30;
@@ -143,11 +146,11 @@ class GameSystem
         gameSystem = this
         this.selectedArrow = 0
         this.selectableTool = [
-            [14,16,"security"],
-            [60,16,"nature"],
-            [108,16,"population"],
-            [156,16,"work"],
-            [202,16,"happiness"]
+            [74,16,"security"],
+            [120,16,"nature"],
+            [168,16,"population"],
+            [216,16,"work"],
+            [262,16,"happiness"]
         ]
         this.typeOrder = [
             type.security,
@@ -343,9 +346,9 @@ class GameSystem
                     },ind,x,y)
                 }
 
-        let toolOffset = (this.canvas.width - 320)/2
+        let toolOffset = (this.canvas.width - 380)/2
         drawer.addDrawUI((drawer,args) => {
-            drawImageWithScale(drawer,"./img/ui/Toolbar.png",toolOffset,this.floor,320,64)
+            drawImageWithScale(drawer,"./img/ui/Toolbar.png",toolOffset,this.floor,380,64)
         },null);
         for(let s in this.selectableTool)
         {
@@ -372,12 +375,12 @@ class GameSystem
         },null);
 
         drawer.addDrawUI((drawer,args) => {
-            drawImageWithScale(drawer,"./img/ui/Toolbar-lowBar.png",toolOffset,this.floor,320,64)
+            drawImageWithScale(drawer,"./img/ui/Toolbar-lowBar.png",toolOffset,this.floor,380,64)
         },null);
         drawer.addDrawUI((drawer,args) => {
             let arrowIcon = this.floor > this.MousePos[1] || 
-                toolOffset + 256 > this.MousePos[0] || 
-                toolOffset + 320 < this.MousePos[0] ? null :
+                toolOffset + 316 > this.MousePos[0] || 
+                toolOffset + 380 < this.MousePos[0] ? null :
                 this.floor + 32 > this.MousePos[1] ?
                     "up" :
                     "down"
@@ -387,7 +390,7 @@ class GameSystem
                     this.selectedArrow = 1
                 else
                     this.selectedArrow = 2
-                drawImageWithScale(drawer,"./img/ui/Toolbar-arrow-"+arrowIcon+".png",toolOffset,this.floor,320,64)
+                drawImageWithScale(drawer,"./img/ui/Toolbar-arrow-"+arrowIcon+".png",toolOffset+60,this.floor,320,64)
             } else {
                 this.selectedArrow = 0;
             }
@@ -492,7 +495,7 @@ class GameSystem
     {
         this.canvas.remove()
         barInterv.forEach(b=>clearInterval(b))
-        score(0,string)
+        score(endScore,string)
         audio.pause();
     }
 
@@ -507,9 +510,14 @@ class GameSystem
         if (audio.currentTime == audio.duration) this.timer = 0;
         if (this.interV > this.intervalBetween)
         {
-            disasterList[Math.floor(Math.random()*disasterList.length)].create(1,30)
+            if (this.disasterI++ == 1) {
+                this.disasterC++;
+                this.disasterI %= 2;
+            }
+            for(let i = this.disasterC;i>0;i--)
+                disasterList[Math.floor(Math.random()*disasterList.length)].create(1,30)
             this.interV%= this.intervalBetween;
-            gameStats.cost += gameStats.economics * gameStats.work
+            gameStats.cost += Math.round(gameStats.economics * 0.2 * gameStats.work + gameStats.work)
         }
         if (this.timer <= 0)
         {

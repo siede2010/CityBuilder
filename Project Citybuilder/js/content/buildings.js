@@ -10,6 +10,7 @@ function buildings()
         self.type = type.population
         self.turnable = true
         self.heightDiff = 32
+        self.score = 5;
     })
     forest = new BuildingType("forest").getThis((self) => {
         self.setStat(stats.food,1)
@@ -18,6 +19,7 @@ function buildings()
         self.setStat(stats.nature,2)
         self.type = type.nature
         self.turnable = false
+        self.score = 3
     })
     smallHospital = new BuildingType("small-hospital").getThis((self) => {
         self.setStat(stats.healthCare,3)
@@ -27,6 +29,7 @@ function buildings()
         self.turnable = false
         self.type = type.security
         self.heightDiff = 14
+        self.score = 8
     })
     /* //House is Bigger than an apartment? yea ok.
     house = new MultiBlockType("house").getThis((self) => {
@@ -44,12 +47,18 @@ function buildings()
     road = new RoadType("road").getThis((self) => {
         self.setStat(stats.cost,-1)
         self.type = type.security
+        self.connectEvent = (build) => {
+            gameStats[stats.happiness]+=1;
+            endScore += 1;
+        }
+        self.score = 1;
     })
     solarPannel = new BuildingType("solar-pannel").getThis((self) => {
         self.setStat(stats.cost,-2)
         self.setStat(stats.energy,2)
         self.type = type.work
         self.turnable = false
+        self.score = 4
     })
     powerplant = new MultiBlockType("power-plant").getThis((self) => {
         self.setStat(stats.cost,-12)
@@ -64,6 +73,7 @@ function buildings()
         self.width = 2;
         self.heightDiff = 90;
         self.xOffset = -32;
+        self.score = 22;
     })
     mall = new MultiBlockType("mall").getThis((self) => {
         self.setStat(stats.food,10)
@@ -78,6 +88,7 @@ function buildings()
         self.width = 2;
         self.heightDiff = 66;
         self.xOffset = -4;
+        self.score = 15;
     }) 
     park = new MultiBlockType("park").getThis((self) => {
         self.setStat(stats.nature,4)
@@ -90,6 +101,7 @@ function buildings()
         self.height = 2;
         self.heightDiff = 66;
         self.xOffset = -4;
+        self.score = 12;
     })
     farm = new MultiBlockType("farm").getThis((self) => {
         self.setStat(stats.food,15)
@@ -102,8 +114,10 @@ function buildings()
         self.turnable = true
         self.height = 3;
         self.width = 2;
+        self.rotations = 2;
         self.heightDiff = 90;
         self.xOffset = -32;
+        self.score = 18;
     })
     waterpark = new MultiBlockType("waterpark").getThis((self) => {
         self.setStat(stats.happiness,20)
@@ -114,7 +128,9 @@ function buildings()
         self.turnable = true
         self.height = 3;
         self.width = 2;
+        self.rotations = 2;
         self.heightDiff = 90;
         self.xOffset = -32;
+        self.score = 25
     })
 }

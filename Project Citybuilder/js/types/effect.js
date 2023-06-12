@@ -42,10 +42,12 @@ class RainType
         this.landSprites = landSprites
         this.rainSprite = sprite
         this.splashSprite = spriteLand
+        this.currain = null
     }
     create(intensity,duration)
     {
-        return new Rain(intensity,duration,this)
+        if (this.currain == null || this.currain.ended == true)
+            return this.currain = new Rain(intensity,duration,this)
     }
 }
 class Rain

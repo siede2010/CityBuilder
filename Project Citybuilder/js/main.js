@@ -1,3 +1,4 @@
+let endScore = 0;
 let m = getElementById(hidden,"mainMenue")
 let opt = getElementById(hidden,"optionScreen")
 let inf = getElementById(hidden,"infoScreen")

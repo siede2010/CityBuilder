@@ -57,6 +57,8 @@ class Building
     }
 
     remove() {
+        for(let i in this.source.stats)
+            gameStats[i] += this.source.stats[i]
         let grid = this.source.floor ? gameSystem.tileGridUnder : gameSystem.tileGrid
         grid.set(this.position,new noBuild([this.source.floor]))
     }
@@ -73,6 +75,7 @@ class BuildingType
         this.floor = false
         this.turnable = false
         this.rotations = 4;
+        this.score = 0;
         for(let i in stats)
             this.stats[i] = 0
         allBuildings.push(this)
@@ -133,6 +136,7 @@ class BuildingType
     }
     pay()
     {
+        endScore += this.score;
         for (let stat in this.stats)
         {
             gameStats[stat] += this.stats[stat]
@@ -173,13 +177,11 @@ class Road extends Building
             c = gameSystem.tileGridUnder.get(this.position.x,this.position.y-1)
         if (!blocked[1] && this.position.y > 0 && c != null && c.source == this.source)
             i+=2
-            /*
-        if (i != 0 && i != connections)
+        if (i != 0 && i != this.connections)
         {
-            connections = i;
+            this.connections = i;
             this.source.connectEvent(this)
         }
-        */
         return "./img/road/" + this.name + "-" + i + ".png"
     }
 }
@@ -190,6 +192,7 @@ class RoadType extends BuildingType
         super(name)
         this.floor = true
         this.turnable = false
+        this.connectEvent = (building) => {}
     }
     getIcon = function()
     {
@@ -249,6 +252,8 @@ class MultiBuilding extends Building
         return "./img/buildings/" + this.name + "/" + this.name + ".png"
     }
     remove = function() {
+        for(let i in this.source.stats)
+            gameStats[i] += this.source.stats[i]
         let grid = this.source.floor ? gameSystem.tileGridUnder : gameSystem.tileGrid
         grid.set(this.position,new noBuild([this.source.floor]))
         for(let tile in this.tiles)

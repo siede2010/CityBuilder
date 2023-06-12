@@ -18,7 +18,6 @@ function disasters()
             elem.arr = true;
     }
     tornado.initLogic = (elem) => {
-        rain.create(1,30);
         elem.data.hp = 5;
     }
     badweather = new DisasterType("lightning",12,6,true,32,64)
@@ -29,12 +28,13 @@ function disasters()
             if (Math.random() < 0.2)
                 Flash.create(5)
         }
-        if (elem.data.rainElem.ended)
+        if (elem.data.frames-- <= 0)
             elem.arr = true;
     }
     badweather.initLogic = (elem) => {
         elem.x = gameSystem.canvas.width * Math.random()
         elem.y = gameSystem.canvas.width * Math.random()
-        elem.data.rainElem = rain.create(3,15)
+        elem.data.frames = 60*15;
+        rain.create(1,25)
     }
 }
