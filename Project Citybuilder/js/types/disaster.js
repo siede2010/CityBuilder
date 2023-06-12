@@ -57,6 +57,5 @@ class Disaster{
             if (this.arr)
                 drawer.remove(this.uElem.id)
         },null)
-        Flash.create(15);
     }
 }

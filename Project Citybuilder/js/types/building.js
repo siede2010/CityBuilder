@@ -56,9 +56,15 @@ class Building
         gameStats.food += this.getStat(stats.food)/30
     }
 
+    deconstruct() {
+        gameStats["cost"] -= this.source.stats["cost"] * 0.5;
+        this.remove();
+    }
+
     remove() {
         for(let i in this.source.stats)
-            gameStats[i] += this.source.stats[i]
+            gameStats[i] -= this.source.stats[i]
+        gameStats["cost"] += this.source.stats["cost"]
         let grid = this.source.floor ? gameSystem.tileGridUnder : gameSystem.tileGrid
         grid.set(this.position,new noBuild([this.source.floor]))
     }
@@ -253,7 +259,7 @@ class MultiBuilding extends Building
     }
     remove = function() {
         for(let i in this.source.stats)
-            gameStats[i] += this.source.stats[i]
+            gameStats[i] -= this.source.stats[i]
         let grid = this.source.floor ? gameSystem.tileGridUnder : gameSystem.tileGrid
         grid.set(this.position,new noBuild([this.source.floor]))
         for(let tile in this.tiles)
@@ -314,6 +320,9 @@ class Reference
     remove() {
         this.ref.remove()
     }
+    deconstruct() {
+        this.ref.deconstruct()
+    }
 }
 class noBuild
 {
@@ -333,4 +342,5 @@ class noBuild
     spriteOffset() {return [-4,0]}
     update() {}
     remove() {}
+    deconstruct() {}
 }

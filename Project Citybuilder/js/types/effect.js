@@ -4,30 +4,38 @@ function effect()
 }
 
 //Base Effects ----------------------------
-class EffectType
+class TextEffectType
 {
-    constructor(sprite)
+    static lis = [];
+    static create(x = 0,y = 0,text = "")
     {
-        this.sprite = sprite;
+        this.lis.push(new TextEffect(x,y,text))
+        return this.lis[this.lis.length-1]
     }
-    creat(x = 0,y = 0)
+    static clear()
     {
-        return new Effect(this.sprite,x,y)
+        for(let i in this.lis)
+            this.lis[i].end = true
+        this.lis = [];
     }
 }
-class Effect
+class TextEffect
 {
-    constructor(picture,x,y)
+    constructor(x,y,txt)
     {
-        this.pic = picture
+        this.text = txt
         this.x = x
         this.y = y
         this.initDrawer()
+        this.end = false;
     }
     initDrawer()
     {
-        drawer.addDraw((drawer,args) => {
-            drawImage(drawer,this.pic,this.x,this.y)
+        let d = drawer.addDraw((draw,args) => {
+            drawer.textStyle(22,"serif","#000000")
+            drawer.drawText(this.x,this.y,this.text)
+            if (this.end)
+                drawer.remove(d.id)
         },null)
     }
 }
@@ -48,6 +56,10 @@ class RainType
     {
         if (this.currain == null || this.currain.ended == true)
             return this.currain = new Rain(intensity,duration,this)
+        else {
+            this.currain.ticksLeft = duration * 30
+            return this.currain
+        }
     }
 }
 class Rain

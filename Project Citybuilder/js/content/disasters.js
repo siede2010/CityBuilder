@@ -36,5 +36,6 @@ function disasters()
         elem.y = gameSystem.canvas.width * Math.random()
         elem.data.frames = 60*15;
         rain.create(1,25)
+        Flash.create(5)
     }
 }

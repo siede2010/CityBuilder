@@ -130,6 +130,7 @@ class GameSystem
         this.margin = margin;
         this.drawPlace = false
         this.buildrotation = 0
+        this.destroySel = 0
         this.disasterI = 0
         this.disasterC = 0
         this.particles = []
@@ -152,6 +153,10 @@ class GameSystem
             [216,16,"work"],
             [262,16,"happiness"]
         ]
+        this.destroySelPos = {
+            x:9,
+            y:16
+        }
         this.typeOrder = [
             type.security,
             type.nature,
@@ -201,21 +206,27 @@ class GameSystem
         //Events
         this.canvas.addEventListener("mousedown",(e) => {
             this.clickPos = this.getMousePosition(this.canvas,e)
-            
-            if (this.gridSelected.x != -1 && this.gridSelected.y != -1 && this.selectedIndex != -1)
+
+            if (this.gridSelected.x != -1 && this.gridSelected.y != -1)
             {
-                let tower = this.towers[this.typeOrder[this.selectedIndex]][this.selectedTower[this.typeOrder[this.selectedIndex]]]
-                if (tower.floor == true)
-                    this.tileGridUnder.set(this.gridSelected.x,this.gridSelected.y,tower.build(this.buildrotation,this.gridSelected.y * this.tileGrid.width + this.gridSelected.x))
-                else 
-                    this.tileGrid.set(this.gridSelected.x,this.gridSelected.y,tower.build(this.buildrotation,this.gridSelected.y * this.tileGrid.width + this.gridSelected.x))
+                if (this.selectedIndex != -1) {
+                    let tower = this.towers[this.typeOrder[this.selectedIndex]][this.selectedTower[this.typeOrder[this.selectedIndex]]]
+                    if (tower.floor == true)
+                        this.tileGridUnder.set(this.gridSelected.x,this.gridSelected.y,tower.build(this.buildrotation,this.gridSelected.y * this.tileGrid.width + this.gridSelected.x))
+                    else 
+                        this.tileGrid.set(this.gridSelected.x,this.gridSelected.y,tower.build(this.buildrotation,this.gridSelected.y * this.tileGrid.width + this.gridSelected.x))
+                } else if (this.destroySel == 2 && size > this.gridSelected.x && size > this.gridSelected.y) {
+                    this.tileGrid.get(this.gridSelected.x,this.gridSelected.y).deconstruct()
+                }
             }
             //Index Select
             if (this.hoverIndex != -1)
-                if (this.hoverIndex == this.selectedIndex)
+                if (this.hoverIndex == this.selectedIndex) 
                     this.selectedIndex = -1
-                else
+                else {
                     this.selectedIndex = this.hoverIndex
+                    this.destroySel = 0;
+                }
             if (this.selectedIndex == -1)
             {
                 if (this.selectedArrow == 1)
@@ -245,6 +256,12 @@ class GameSystem
                     this.selectedTower[selType] = --this.selectedTower[selType] < 0 ? this.towers[selType].length-1 : this.selectedTower[selType]
                 }
             }
+
+            if (this.destroySel == 1) {
+                this.destroySel = 2;
+                this.selectedIndex = -1;
+            }
+
         this.drawPlace = this.selectedIndex != -1;
         })
 
@@ -275,6 +292,10 @@ class GameSystem
             }
             if (!found)
                 this.hoverIndex = -1;
+            if (withinBounds(toolOffset+this.destroySelPos.x,this.floor+this.destroySelPos.y,40,40,this.MousePos[0],this.MousePos[1]) && this.destroySel != 2)
+                this.destroySel = 1;
+            else if (this.destroySel == 1)
+                this.destroySel = 0;
         })
 
         this.canvas.addEventListener("mouseleave",(e) => {
@@ -365,6 +386,8 @@ class GameSystem
                 let pos = this.selectableTool[this.hoverIndex]
                 drawImageWithScale(drawer,"./img/ui/hover.png",toolOffset+pos[0],this.floor+pos[1],40,40)
             }
+            if (this.destroySel == 1)
+            drawImageWithScale(drawer,"./img/ui/hover.png",toolOffset+this.destroySelPos.x,this.floor+this.destroySelPos.y,40,40)
         },null);
 
         drawer.addDrawUI((drawer,args) => {
@@ -372,6 +395,8 @@ class GameSystem
                 let pos = this.selectableTool[this.selectedIndex]
                 drawImageWithScale(drawer,"./img/ui/selected.png",toolOffset+pos[0],this.floor+pos[1],40,40)
             }
+            if (this.destroySel == 2)
+            drawImageWithScale(drawer,"./img/ui/selected.png",toolOffset+this.destroySelPos.x,this.floor+this.destroySelPos.y,40,40)
         },null);
 
         drawer.addDrawUI((drawer,args) => {
@@ -423,6 +448,10 @@ class GameSystem
                     this.gridSelected.x = gridX
                     this.gridSelected.y = gridY
                     
+                }
+                else if (this.destroySel == 2 && this.hoverIndex == -1) {
+                    this.gridSelected.x = gridX
+                    this.gridSelected.y = gridY
                 }
                 else
                 {
@@ -517,6 +546,8 @@ class GameSystem
             for(let i = this.disasterC;i>=0;i--)
                 disasterList[Math.floor(Math.random()*disasterList.length)].create(1,30)
             this.interV%= this.intervalBetween;
+            if (optionSetting["diff"] >= 2)
+                gameStats.cost += Math.round(gameStats.economics * 0.4 * gameStats.work + gameStats.work * 0.5)
             gameStats.cost += Math.round(gameStats.economics * 0.2 * gameStats.work + gameStats.work)
         }
         if (this.timer <= 0)
@@ -586,9 +617,33 @@ function initiateTutorial()
     m.remove()
     document.body.append(gameUI)
     gameSystem = new GameSystem(4,30,gameUI,gameStats,60)
-    gameSystem.tileGrid.set(0,0,forest.build(0))
+    gameSystem.tileGrid.set(0,0,forest.build(0,0))
     loadBars()
     gameStats.cost = 1000
+    TextEffectType.create(250,50,"Hello There")
+    TextEffectType.create(150,75,"Welcome To The Tutorial")
+    setTimeout(() => {
+        TextEffectType.clear();
+        TextEffectType.create(50,75,"Here you have a Small Place.")
+        TextEffectType.create(0,100,"Where its \"Almost\" Impossible to die")
+        setTimeout(() => {
+            TextEffectType.clear();
+            TextEffectType.create(10,100,"Go on and test out what the Buildings do.")
+            TextEffectType.create(50,125,"1 Minute should be enough. right?")
+            TextEffectType.create(0,150,"<= Are the Stats [Watch out For Food]")
+            setTimeout(() => {
+                TextEffectType.clear();
+                setTimeout(() => {
+                    TextEffectType.create(10,100,"Each 30 Seconds a Disaster Accures.")
+                    TextEffectType.create(10,125,"You need to watch out for those.")
+                    setTimeout(() => {
+                        TextEffectType.clear();
+                        TextEffectType.create(0,150,"To Rotate Buildings use [q] & [e]")
+                    },10000)
+                },16000)
+            },5000)
+        },5000)
+    },5000)
 }
 function loadBars()
 {
