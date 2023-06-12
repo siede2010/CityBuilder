@@ -514,7 +514,7 @@ class GameSystem
                 this.disasterC++;
                 this.disasterI %= 2;
             }
-            for(let i = this.disasterC;i>0;i--)
+            for(let i = this.disasterC;i>=0;i--)
                 disasterList[Math.floor(Math.random()*disasterList.length)].create(1,30)
             this.interV%= this.intervalBetween;
             gameStats.cost += Math.round(gameStats.economics * 0.2 * gameStats.work + gameStats.work)

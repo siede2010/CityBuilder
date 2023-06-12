@@ -25,7 +25,7 @@ function disasters()
         if (elem.frame >= elem.source.frames-1){
             elem.x = gameSystem.canvas.width * Math.random()
             elem.y = gameSystem.canvas.width * Math.random()
-            if (Math.random() < 0.2)
+            if (Math.random() < 0.1)
                 Flash.create(5)
         }
         if (elem.data.frames-- <= 0)
