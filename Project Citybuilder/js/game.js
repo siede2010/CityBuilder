@@ -547,7 +547,7 @@ class GameSystem
                 disasterList[Math.floor(Math.random()*disasterList.length)].create(1,30)
             this.interV%= this.intervalBetween;
             if (optionSetting["diff"] >= 2)
-                gameStats.cost += Math.round(gameStats.economics * 0.4 * gameStats.work + gameStats.work * 0.5)
+                gameStats.cost += Math.round(gameStats.economics * 0.1 * gameStats.work + gameStats.work * 0.4)
             gameStats.cost += Math.round(gameStats.economics * 0.2 * gameStats.work + gameStats.work)
         }
         if (this.timer <= 0)

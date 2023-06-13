@@ -30,7 +30,12 @@
             <button class="center btn btn-success" style="border-style: solid;border-width: 2px;border-color:black" id="Start"><b>Start</b></button><br>
             <button class="center btn btn-warning" style="border-style: solid;border-width: 2px;border-color:black" id="Tutorial"><b>Tutorial</b></button><br>
             <button class="center btn btn-secondary" style="border-style: solid;border-width: 2px;border-color:black" id="Options"><b>Options</b></button><br>
-            <button class="center btn btn-info" style="border-style: solid;border-width: 2px;border-color:black" id="Info"><b>Info</b></button><br>
+            <div id="m1" class="center">
+                <div id="m2" style="display:block ruby">
+                    <button class="btn btn-info" style="border-style: solid;border-width: 2px;border-color:black;margin-right: 20px;" id="Info"><b>Info</b></button><br>
+                    <button class="btn btn-info" style="border-style: solid;border-width: 2px;border-color:black" id="Con"><b>Controlls</b></button><br>
+                </div>
+            </div> <br>
             <button class="center btn btn-dark" style="border-style: solid;border-width: 2px;border-color:black" id="Credits"><b>Credits</b></button><br>
         </div>
         <div id="optionScreen" style="color:white;">
@@ -58,6 +63,7 @@
                 The following World Problems are in this game :
             </b>
             <b class="center" style="color:yellow">2. No Food</b>
+            <b class="center" style="color:orangered">11. Sustainable City's</b>
             <b class="center" style="color:lime">8. Decent Work & Economics</b>
             <b class="center" style="color:cyan">13. Climat Change (Natural Disasters)</b>
             <b class="center" style="color:grey">...</b> <br>
@@ -82,6 +88,25 @@
                 Angelo Schreiner<br>
                 Raphael Pröglehöf<br>
                 And You
+            </b>
+        </div>
+        <div id="controllScreen" style="color:white">
+            <h1 class="center"><b>Controlls</b></h1><br>
+            <button class="btn btn-danger" onclick="goMain()" style="color:white;position: absolute;right:0;top:0"><b>X</b></button>
+            <b class="center">
+                Place / Break : <b style="color:orange">[lmb]</b> <br>
+                Rotate : <b style="color:orange">[Q] & [E]</b> <br>
+                <b style="color:red">[-----]</b> <br>
+                Rotate Selection : <b style="color:lime">Click on the Arrow's while having nothing selected</b> <br>
+                Rotate Single Selection : <b style="color:lime">Click on the Arrow's while having something selected</b> <br>
+                Categorys : <b style="color:yellow">each slot in the Selection is a Category. the following category's exist</b> <br>
+                <ul style="color:cyan">
+                    <li>Security [Mostly HealthCare and Streets]</li>
+                    <li>Nature [Mostly Nature and Happyness]</li>
+                    <li>Housing [Mostly Population]</li>
+                    <li>Buisniss [Mostly Food & Energy]</li>
+                    <li>Happy [Mostly Happyness]</li>
+                </ul>
             </b>
         </div>
     </div>

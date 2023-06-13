@@ -25,11 +25,13 @@ function disasters()
         if (elem.frame >= elem.source.frames-1){
             elem.x = gameSystem.canvas.width * Math.random()
             elem.y = gameSystem.canvas.width * Math.random()
-            if (Math.random() < 0.1)
+            if (optionSetting["diff"] != 0 && Math.random() < 0.1/optionSetting["diff"])
                 Flash.create(5)
         }
-        if (elem.data.frames-- <= 0)
+        if (elem.data.frames-- <= 0) {
             elem.arr = true;
+            gameStats[stats.energy] += 40;
+        }
     }
     badweather.initLogic = (elem) => {
         elem.x = gameSystem.canvas.width * Math.random()
@@ -37,5 +39,6 @@ function disasters()
         elem.data.frames = 60*15;
         rain.create(1,25)
         Flash.create(5)
+        gameStats[stats.energy] -= 40;
     }
 }

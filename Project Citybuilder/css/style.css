@@ -41,6 +41,10 @@ body {
     background-color: darkslategray;
 }
 
+button {
+    display:flex;
+}
+
 .coin {
     width: 32px;  /* Adjust width to match the frame size */
     height: 32px; /* Adjust height to match the frame size */

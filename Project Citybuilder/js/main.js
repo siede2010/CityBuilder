@@ -3,12 +3,14 @@ let m = getElementById(hidden,"mainMenue")
 let opt = getElementById(hidden,"optionScreen")
 let inf = getElementById(hidden,"infoScreen")
 let cre = getElementById(hidden,"creditScreen")
+let con = getElementById(hidden,"controllScreen")
 
 let start = getElementById(m,"Start")
 let tutorial = getElementById(m,"Tutorial")
 let options = getElementById(m,"Options")
-let info = getElementById(m,"Info")
+let info = getElementById(getElementById(getElementById(m,"m1"),"m2"),"Info")
 let credits = getElementById(m,"Credits")
+let controll = getElementById(getElementById(getElementById(m,"m1"),"m2"),"Con")
 class GlobalVar
 {
     constructor(startVar)
@@ -41,6 +43,7 @@ function main()
     options.addEventListener("click",() => {optionScreen()})
     info.addEventListener("click",() => {infoScreen()})
     credits.addEventListener("click",() => {creditScreen()})
+    controll.addEventListener("click",() => {goCont()})
 }
 function score(s,string)
 {
@@ -61,6 +64,10 @@ function score(s,string)
         p.innerText = ""
         goMain()
     })
+}
+function goCont() {
+    m.remove();
+    document.body.append(con)
 }
 function goMain()
 {
