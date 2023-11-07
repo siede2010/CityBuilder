@@ -524,7 +524,7 @@ class GameSystem
     {
         this.canvas.remove()
         barInterv.forEach(b=>clearInterval(b))
-        score(endScore,string)
+        score(endScore + gameStats["cost"],string)
         audio.pause();
     }
 
